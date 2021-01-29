@@ -30,6 +30,9 @@
     "size": "size-limit",
     "analyze": "size-limit --why"
   },
+  "dependencies": {
+    "bignumber.js": "^9.0.1"
+  },
   "peerDependencies": {
     "@taquito/taquito": "^7.0.0 || ^7.0.0-beta || ^8.0.0-beta"
   },
