@@ -34,11 +34,11 @@
     "bignumber.js": "^9.0.1"
   },
   "peerDependencies": {
-    "@taquito/taquito": "^7.0.0 || ^7.0.0-beta || ^8.0.0-beta"
+    "@taquito/taquito": "^8.0.0-beta"
   },
   "devDependencies": {
     "@size-limit/preset-small-lib": "^4.9.1",
-    "@taquito/taquito": "^8.0.0-beta.3",
+    "@taquito/taquito": "^8.0.0-beta.7",
     "husky": "^4.3.8",
     "size-limit": "^4.9.1",
     "tsdx": "^0.14.1",

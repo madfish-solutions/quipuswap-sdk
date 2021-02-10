@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import { Contract, Token, OperationOptions } from "../types";
-import { fromOpOpts, isFA2Token } from "../helpers";
+import { fromOpOpts, isFA2Token, toContractAddress } from "../helpers";
 
 export function launchExchange(
   factory: Contract,
@@ -9,11 +9,11 @@ export function launchExchange(
   tezValue: BigNumber.Value,
   opts?: OperationOptions
 ) {
+  const tokenAddress = toContractAddress(token.contract);
+
   return factory.methods
     .launchExchange(
-      ...(isFA2Token(token)
-        ? [token.contract.address, token.id]
-        : [token.contract.address]),
+      ...(isFA2Token(token) ? [tokenAddress, token.id] : [tokenAddress]),
       tokenValue
     )
     .toTransferParams(fromOpOpts(tezValue, opts));
