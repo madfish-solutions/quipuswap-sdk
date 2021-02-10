@@ -7,6 +7,7 @@ import {
   Token,
   FA2Token,
   Asset,
+  ContractOrAddress,
 } from "./types";
 
 export function fromOpOpts(
@@ -33,6 +34,21 @@ export function estimateTransfers(
   );
 }
 
+export async function toContract(
+  tezos: TezosToolkit,
+  contractOrAddress: ContractOrAddress
+) {
+  return typeof contractOrAddress === "string"
+    ? tezos.contract.at(contractOrAddress)
+    : contractOrAddress;
+}
+
+export function toContractAddress(contractOrAddress: ContractOrAddress) {
+  return typeof contractOrAddress === "string"
+    ? contractOrAddress
+    : contractOrAddress.address;
+}
+
 export function isFA2Token(token: Token): token is FA2Token {
   return typeof token.id !== "undefined";
 }
@@ -43,4 +59,10 @@ export function isXTZAsset(asset: Asset): asset is "xtz" {
 
 export function isTokenAsset(asset: Asset): asset is Token {
   return asset !== "xtz";
+}
+
+export function assertNat(val: BigNumber) {
+  if (!val.isInteger() || val.isNegative()) {
+    throw new Error("Value is not non-negative natural number");
+  }
 }

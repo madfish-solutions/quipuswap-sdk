@@ -1,0 +1,3 @@
+export const FEE_RATE = 333;
+export const VETO_PERIOD = 7889229;
+export const ACCURANCY_MULTIPLIER = 1000000000000000;

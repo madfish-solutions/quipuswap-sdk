@@ -11,6 +11,8 @@ export { TransferParams } from "@taquito/taquito/dist/types/operations/types";
 
 export type Contract = ContractAbstraction<ContractProvider | Wallet>;
 
+export type ContractOrAddress = Contract | string;
+
 export type OperationOptions = Partial<{
   source: string;
   fee: BigNumber.Value;
@@ -21,7 +23,7 @@ export type OperationOptions = Partial<{
 export type Batch = OperationBatch | WalletOperationBatch;
 
 export interface Token {
-  contract: Contract;
+  contract: ContractOrAddress;
   id?: BigNumber.Value;
 }
 
@@ -32,8 +34,8 @@ export interface FA2Token extends Token {
 export type Asset = Token | "xtz";
 
 export interface Factories {
-  fa1_2Factory: Contract;
-  fa2Factory: Contract;
+  fa1_2Factory: ContractOrAddress;
+  fa2Factory: ContractOrAddress;
 }
 
 export interface FA2TransferParams {
