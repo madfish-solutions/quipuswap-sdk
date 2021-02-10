@@ -6,6 +6,19 @@ import {
 } from "../types";
 import { fromOpOpts } from "../helpers";
 
+export enum Errors {
+  TokenUndefined = "FA2_TOKEN_UNDEFINED",
+  InsufficientBalance = "FA2_INSUFFICIENT_BALANCE",
+  TxDenied = "FA2_TX_DENIED",
+  NotOwner = "FA2_NOT_OWNER",
+  NotOperator = "FA2_NOT_OPERATOR",
+  OperatorsUnsupported = "FA2_OPERATORS_UNSUPPORTED",
+  ReceiverHookFailed = "FA2_RECEIVER_HOOK_FAILED",
+  SenderHookFailed = "FA2_SENDER_HOOK_FAILED",
+  ReceiverHookUndefined = "FA2_RECEIVER_HOOK_UNDEFINED",
+  SenderHookUndefined = "FA2_SENDER_HOOK_UNDEFINED",
+}
+
 export function transfer(
   fa2: Contract,
   transfers: FA2TransferParams[],

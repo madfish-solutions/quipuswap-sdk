@@ -2,6 +2,12 @@ import BigNumber from "bignumber.js";
 import { Contract, OperationOptions } from "../types";
 import { fromOpOpts } from "../helpers";
 
+export enum Errors {
+  NotEnoughBalance = "NotEnoughBalance",
+  NotEnoughAllowance = "NotEnoughAllowance",
+  UnsafeAllowanceChange = "UnsafeAllowanceChange",
+}
+
 export function transfer(
   fa1_2: Contract,
   from: string,

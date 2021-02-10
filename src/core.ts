@@ -114,7 +114,7 @@ export async function withTokenApprove(
   try {
     await estimateTransfers(tezos, [approveParams]);
   } catch (err) {
-    if (err?.message === "UnsafeAllowanceChange") {
+    if (err?.message === FA1_2.Errors.UnsafeAllowanceChange) {
       resetApprove = true;
     }
   }
