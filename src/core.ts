@@ -17,7 +17,14 @@ import {
   estimateTransfers,
 } from "./helpers";
 import { Factory, Dex, FA1_2, FA2 } from "./contracts";
-import { estimateTezToToken, estimateTokenToTez } from "./estimates";
+import {
+  estimateSharesInTez,
+  estimateSharesInToken,
+  estimateTezInShares,
+  estimateTezToToken,
+  estimateTokenInShares,
+  estimateTokenToTez,
+} from "./estimates";
 
 export async function swap(
   tezos: TezosToolkit,
@@ -106,7 +113,7 @@ export async function initializeLiquidity(
   tezValue: BigNumber.Value
 ) {
   const dex = await findDexNonStrict(tezos, factories, token);
-  if (dex && (await isDexContainsLiquidity(tezos, dex))) {
+  if (dex && (await isDexContainsLiquidity(dex))) {
     throw new DexAlreadyContainsLiquidity();
   }
 
@@ -138,36 +145,88 @@ export async function initializeLiquidity(
 
 export async function addLiquidity(
   tezos: TezosToolkit,
-  factories: Factories,
+  dex: ContractOrAddress,
   fromAccount: string,
-  token: Token,
-  tokenValue: BigNumber.Value,
-  tezValue: BigNumber.Value
+  values:
+    | { tokenValue: BigNumber.Value; tezValue: BigNumber.Value }
+    | { tokenValue: BigNumber.Value }
+    | { tezValue: BigNumber.Value }
 ) {
-  const dex = await findDex(tezos, factories, token);
-  if (!(await isDexContainsLiquidity(tezos, dex))) {
+  const dexContract = await toContract(tezos, dex);
+  if (!(await isDexContainsLiquidity(dexContract))) {
     throw new DexNotContainsLiquidity();
   }
 
-  return withTokenApprove(tezos, token, fromAccount, dex.address, tokenValue, [
-    Dex.investLiquidity(dex, tokenValue, tezValue),
-  ]);
+  const dexStorage = await dexContract.storage();
+  const token = getDexToken(dexStorage);
+
+  let tokenValue: BigNumber.Value;
+  let tezValue: BigNumber.Value;
+  if ("tokenValue" in values && "tezValue" in values) {
+    tokenValue = values.tokenValue;
+    tezValue = values.tezValue;
+  } else if ("tokenValue" in values) {
+    tokenValue = values.tokenValue;
+    const shares = estimateSharesInToken(dexStorage, tokenValue);
+    tezValue = estimateTezInShares(dexStorage, shares).plus(1);
+  } else {
+    tezValue = values.tezValue;
+    const shares = estimateSharesInTez(dexStorage, tezValue);
+    tokenValue = estimateTokenInShares(dexStorage, shares).plus(1);
+  }
+
+  return withTokenApprove(
+    tezos,
+    token,
+    fromAccount,
+    dexContract.address,
+    tokenValue,
+    [Dex.investLiquidity(dexContract, tokenValue, tezValue)]
+  );
 }
 
 export async function removeLiquidity(
   tezos: TezosToolkit,
-  factories: Factories,
+  dex: ContractOrAddress,
   fromAccount: string,
-  token: Token,
-  shares: BigNumber.Value,
-  tokenValue: BigNumber.Value,
-  tezValue: BigNumber.Value
+  lpTokenValue: BigNumber.Value,
+  slippageTolerance: BigNumber.Value
 ) {
-  const dex = await findDex(tezos, factories, token);
+  const dexContract = await toContract(tezos, dex);
+  const dexStorage = await dexContract.storage();
 
-  return withTokenApprove(tezos, token, fromAccount, dex.address, tokenValue, [
-    Dex.divestLiquidity(dex, shares, tokenValue, tezValue),
-  ]);
+  const lpToken = toLPToken(dexContract, dexStorage);
+  const tokenValueMin = withSlippage(
+    estimateTokenInShares(dexStorage, lpTokenValue),
+    slippageTolerance
+  );
+  const tezValueMin = withSlippage(
+    estimateTezInShares(dexStorage, lpTokenValue),
+    slippageTolerance
+  );
+
+  return withTokenApprove(
+    tezos,
+    lpToken,
+    fromAccount,
+    dexContract.address,
+    lpTokenValue,
+    [Dex.divestLiquidity(dexContract, lpTokenValue, tokenValueMin, tezValueMin)]
+  );
+}
+
+export function toLPToken(dex: ContractOrAddress, dexStorage: any): Token {
+  return {
+    contract: dex,
+    id: "token_id" in dexStorage.storage ? 0 : undefined,
+  };
+}
+
+export function getDexToken(dexStorage: any): Token {
+  return {
+    contract: dexStorage.storage.token_address,
+    id: dexStorage.storage.token_id,
+  };
 }
 
 export async function isDexExistAndContainsLiquidity(
@@ -177,15 +236,11 @@ export async function isDexExistAndContainsLiquidity(
 ) {
   const dex = await findDexNonStrict(tezos, factories, token);
   if (!dex) return false;
-  return isDexContainsLiquidity(tezos, dex);
+  return isDexContainsLiquidity(dex);
 }
 
-export async function isDexContainsLiquidity(
-  tezos: TezosToolkit,
-  dex: ContractOrAddress
-) {
-  const dexContract = await toContract(tezos, dex);
-  const dexStorage = await dexContract.storage<any>();
+export async function isDexContainsLiquidity(dex: Contract) {
+  const dexStorage = await dex.storage<any>();
   return !new BigNumber(dexStorage.storage.invariant).isZero();
 }
 
