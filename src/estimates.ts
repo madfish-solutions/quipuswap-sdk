@@ -11,10 +11,12 @@ export function estimateTezToToken(
   if (tezValueBN.isZero()) return new BigNumber(0);
 
   const fee = tezValueBN.idiv(FEE_RATE);
-  const newTezPool = tezValueBN.plus(dexStorage.tezPool);
+  const newTezPool = tezValueBN.plus(dexStorage.storage.tez_pool);
   const tempTezPool = newTezPool.minus(fee);
-  const newTokenPool = new BigNumber(dexStorage.invariant).idiv(tempTezPool);
-  return new BigNumber(dexStorage.tokenPool).minus(newTokenPool);
+  const newTokenPool = new BigNumber(dexStorage.storage.invariant).idiv(
+    tempTezPool
+  );
+  return new BigNumber(dexStorage.storage.token_pool).minus(newTokenPool);
 }
 
 export function estimateTezToTokenInverse(
@@ -25,10 +27,14 @@ export function estimateTezToTokenInverse(
   assertNat(tokenValueBN);
   if (tokenValueBN.isZero()) return new BigNumber(0);
 
-  const newTokenPool = new BigNumber(dexStorage.tokenPool).minus(tokenValueBN);
-  const tempTezPool = new BigNumber(dexStorage.invariant).idiv(newTokenPool);
+  const newTokenPool = new BigNumber(dexStorage.storage.token_pool).minus(
+    tokenValueBN
+  );
+  const tempTezPool = new BigNumber(dexStorage.storage.invariant).idiv(
+    newTokenPool
+  );
   const fee = tempTezPool
-    .minus(dexStorage.tezPool)
+    .minus(dexStorage.storage.tez_pool)
     .idiv(new BigNumber(FEE_RATE).minus(1));
   return fee.times(FEE_RATE);
 }
@@ -42,10 +48,14 @@ export function estimateTokenToTez(
   if (tokenValueBN.isZero()) return new BigNumber(0);
 
   const fee = tokenValueBN.idiv(FEE_RATE);
-  const newTokenPool = new BigNumber(dexStorage.tokenPool).plus(tokenValueBN);
+  const newTokenPool = new BigNumber(dexStorage.storage.token_pool).plus(
+    tokenValueBN
+  );
   const tempTokenPool = newTokenPool.minus(fee);
-  const newTezPool = new BigNumber(dexStorage.invariant).idiv(tempTokenPool);
-  return new BigNumber(dexStorage.tezPool).minus(newTezPool);
+  const newTezPool = new BigNumber(dexStorage.storage.invariant).idiv(
+    tempTokenPool
+  );
+  return new BigNumber(dexStorage.storage.tez_pool).minus(newTezPool);
 }
 
 export function estimateTokenToTezInverse(
@@ -56,10 +66,14 @@ export function estimateTokenToTezInverse(
   assertNat(tezValueBN);
   if (tezValueBN.isZero()) return new BigNumber(0);
 
-  const newTezPool = new BigNumber(dexStorage.tezPool).minus(tezValueBN);
-  const tempTokenPool = new BigNumber(dexStorage.invariant).idiv(newTezPool);
+  const newTezPool = new BigNumber(dexStorage.storage.tez_pool).minus(
+    tezValueBN
+  );
+  const tempTokenPool = new BigNumber(dexStorage.storage.invariant).idiv(
+    newTezPool
+  );
   const fee = tempTokenPool
-    .minus(dexStorage.tokenPool)
+    .minus(dexStorage.storage.token_pool)
     .idiv(new BigNumber(FEE_RATE).minus(1));
   return fee.times(FEE_RATE);
 }
@@ -72,7 +86,9 @@ export function estimateSharesInTez(
   assertNat(tezValueBN);
   if (tezValueBN.isZero()) return new BigNumber(0);
 
-  return tezValueBN.times(dexStorage.totalSupply).idiv(dexStorage.tezPool);
+  return tezValueBN
+    .times(dexStorage.storage.total_supply)
+    .idiv(dexStorage.storage.tez_pool);
 }
 
 export function estimateSharesInToken(
@@ -83,7 +99,9 @@ export function estimateSharesInToken(
   assertNat(tokenValueBN);
   if (tokenValueBN.isZero()) return new BigNumber(0);
 
-  return tokenValueBN.times(dexStorage.totalSupply).idiv(dexStorage.tokenPool);
+  return tokenValueBN
+    .times(dexStorage.storage.total_supply)
+    .idiv(dexStorage.storage.token_pool);
 }
 
 export function estimateTezInShares(dexStorage: any, shares: BigNumber.Value) {
@@ -91,7 +109,9 @@ export function estimateTezInShares(dexStorage: any, shares: BigNumber.Value) {
   assertNat(sharesBN);
   if (sharesBN.isZero()) return new BigNumber(0);
 
-  return sharesBN.times(dexStorage.tezPool).idiv(dexStorage.totalSupply);
+  return sharesBN
+    .times(dexStorage.storage.tez_pool)
+    .idiv(dexStorage.storage.total_supply);
 }
 
 export function estimateTokenInShares(
@@ -102,5 +122,7 @@ export function estimateTokenInShares(
   assertNat(sharesBN);
   if (sharesBN.isZero()) return new BigNumber(0);
 
-  return sharesBN.times(dexStorage.tokenPool).idiv(dexStorage.totalSupply);
+  return sharesBN
+    .times(dexStorage.storage.token_pool)
+    .idiv(dexStorage.storage.total_supply);
 }

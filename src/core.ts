@@ -1,6 +1,13 @@
 import BigNumber from "bignumber.js";
 import { TezosToolkit } from "@taquito/taquito";
-import { Asset, Token, Factories, TransferParams, Contract } from "./types";
+import {
+  Asset,
+  Token,
+  Factories,
+  TransferParams,
+  Contract,
+  ContractOrAddress,
+} from "./types";
 import {
   isFA2Token,
   isXTZAsset,
@@ -9,7 +16,7 @@ import {
   toContractAddress,
   estimateTransfers,
 } from "./helpers";
-import { Dex, FA1_2, FA2 } from "./contracts";
+import { Factory, Dex, FA1_2, FA2 } from "./contracts";
 import { estimateTezToToken, estimateTokenToTez } from "./estimates";
 
 export async function swap(
@@ -90,6 +97,113 @@ export async function swap(
   }
 }
 
+export async function initializeLiquidity(
+  tezos: TezosToolkit,
+  factories: Factories,
+  fromAccount: string,
+  token: Token,
+  tokenValue: BigNumber.Value,
+  tezValue: BigNumber.Value
+) {
+  const dex = await findDexNonStrict(tezos, factories, token);
+  if (dex && (await isDexContainsLiquidity(tezos, dex))) {
+    throw new DexAlreadyContainsLiquidity();
+  }
+
+  if (dex) {
+    return withTokenApprove(
+      tezos,
+      token,
+      fromAccount,
+      dex.address,
+      tokenValue,
+      [Dex.initializeExchange(dex, tokenValue, tezValue)]
+    );
+  } else {
+    const factory = await toContract(
+      tezos,
+      isFA2Token(token) ? factories.fa2Factory : factories.fa1_2Factory
+    );
+
+    return withTokenApprove(
+      tezos,
+      token,
+      fromAccount,
+      factory.address,
+      tokenValue,
+      [Factory.launchExchange(factory, token, tokenValue, tezValue)]
+    );
+  }
+}
+
+export async function addLiquidity(
+  tezos: TezosToolkit,
+  factories: Factories,
+  fromAccount: string,
+  token: Token,
+  tokenValue: BigNumber.Value,
+  tezValue: BigNumber.Value
+) {
+  const dex = await findDex(tezos, factories, token);
+  if (!(await isDexContainsLiquidity(tezos, dex))) {
+    throw new DexNotContainsLiquidity();
+  }
+
+  return withTokenApprove(tezos, token, fromAccount, dex.address, tokenValue, [
+    Dex.investLiquidity(dex, tokenValue, tezValue),
+  ]);
+}
+
+export async function removeLiquidity(
+  tezos: TezosToolkit,
+  factories: Factories,
+  fromAccount: string,
+  token: Token,
+  shares: BigNumber.Value,
+  tokenValue: BigNumber.Value,
+  tezValue: BigNumber.Value
+) {
+  const dex = await findDex(tezos, factories, token);
+
+  return withTokenApprove(tezos, token, fromAccount, dex.address, tokenValue, [
+    Dex.divestLiquidity(dex, shares, tokenValue, tezValue),
+  ]);
+}
+
+export async function isDexExistAndContainsLiquidity(
+  tezos: TezosToolkit,
+  factories: Factories,
+  token: Token
+) {
+  const dex = await findDexNonStrict(tezos, factories, token);
+  if (!dex) return false;
+  return isDexContainsLiquidity(tezos, dex);
+}
+
+export async function isDexContainsLiquidity(
+  tezos: TezosToolkit,
+  dex: ContractOrAddress
+) {
+  const dexContract = await toContract(tezos, dex);
+  const dexStorage = await dexContract.storage<any>();
+  return !new BigNumber(dexStorage.storage.invariant).isZero();
+}
+
+export async function findDexNonStrict(
+  tezos: TezosToolkit,
+  factories: Factories,
+  token: Token
+) {
+  try {
+    return await findDex(tezos, factories, token);
+  } catch (err) {
+    if (err instanceof DexNotFoundError) {
+      return null;
+    }
+    throw err;
+  }
+}
+
 export async function findDex(
   tezos: TezosToolkit,
   { fa1_2Factory, fa2Factory }: Factories,
@@ -107,7 +221,7 @@ export async function findDex(
   );
 
   if (!dexAddress) {
-    throw new Error("Dex contract for token not found");
+    throw new DexNotFoundError();
   }
 
   return tezos.contract.at(dexAddress);
@@ -165,4 +279,23 @@ export function withSlippage(val: BigNumber.Value, tolerance: BigNumber.Value) {
   return new BigNumber(val)
     .times(new BigNumber(1).minus(tolerance))
     .integerValue(BigNumber.ROUND_DOWN);
+}
+
+/**
+ * Errors
+ */
+
+export class DexNotFoundError implements Error {
+  name = "DexNotFoundError";
+  message = "Dex contract for token not found";
+}
+
+export class DexAlreadyContainsLiquidity implements Error {
+  name = "DexAlreadyContainsLiquidity";
+  message = "Dex already contains liquidity. Use 'addLiquidity'";
+}
+
+export class DexNotContainsLiquidity implements Error {
+  name = "DexAlreadyContainsLiquidity";
+  message = "Dex doesn't contains liquidity. Use 'initializeLiquidity'";
 }

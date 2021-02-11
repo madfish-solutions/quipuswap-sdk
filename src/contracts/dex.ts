@@ -4,8 +4,8 @@ import { fromOpOpts } from "../helpers";
 
 export function initializeExchange(
   dex: Contract,
-  tezValue: BigNumber.Value,
   tokenValue: BigNumber.Value,
+  tezValue: BigNumber.Value,
   opts?: OperationOptions
 ) {
   return dex.methods
@@ -61,8 +61,8 @@ export function investLiquidity(
 export function divestLiquidity(
   dex: Contract,
   shares: BigNumber.Value,
-  tezValueMin: BigNumber.Value,
   tokenValueMin: BigNumber.Value,
+  tezValueMin: BigNumber.Value,
   opts?: OperationOptions
 ) {
   return dex.methods
