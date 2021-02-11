@@ -29,13 +29,14 @@ import {
 export async function swap(
   tezos: TezosToolkit,
   factories: Factories,
-  fromAccount: string,
   toAccount: string,
   fromAsset: Asset,
   toAsset: Asset,
   value: BigNumber.Value,
   slippageTolerance: BigNumber.Value
 ) {
+  const fromAccount = await tezos.signer.publicKeyHash();
+
   if (isXTZAsset(fromAsset) && isTokenAsset(toAsset)) {
     const dex = await findDex(tezos, factories, toAsset);
     const dexStorage = await dex.storage();
@@ -107,7 +108,6 @@ export async function swap(
 export async function initializeLiquidity(
   tezos: TezosToolkit,
   factories: Factories,
-  fromAccount: string,
   token: Token,
   tokenValue: BigNumber.Value,
   tezValue: BigNumber.Value
@@ -116,6 +116,8 @@ export async function initializeLiquidity(
   if (dex && (await isDexContainsLiquidity(dex))) {
     throw new DexAlreadyContainsLiquidity();
   }
+
+  const fromAccount = await tezos.signer.publicKeyHash();
 
   if (dex) {
     return withTokenApprove(
@@ -146,7 +148,6 @@ export async function initializeLiquidity(
 export async function addLiquidity(
   tezos: TezosToolkit,
   dex: ContractOrAddress,
-  fromAccount: string,
   values:
     | { tokenValue: BigNumber.Value; tezValue: BigNumber.Value }
     | { tokenValue: BigNumber.Value }
@@ -175,6 +176,8 @@ export async function addLiquidity(
     tokenValue = estimateTokenInShares(dexStorage, shares).plus(1);
   }
 
+  const fromAccount = await tezos.signer.publicKeyHash();
+
   return withTokenApprove(
     tezos,
     token,
@@ -188,7 +191,6 @@ export async function addLiquidity(
 export async function removeLiquidity(
   tezos: TezosToolkit,
   dex: ContractOrAddress,
-  fromAccount: string,
   lpTokenValue: BigNumber.Value,
   slippageTolerance: BigNumber.Value
 ) {
@@ -204,6 +206,8 @@ export async function removeLiquidity(
     estimateTezInShares(dexStorage, lpTokenValue),
     slippageTolerance
   );
+
+  const fromAccount = await tezos.signer.publicKeyHash();
 
   return withTokenApprove(
     tezos,
