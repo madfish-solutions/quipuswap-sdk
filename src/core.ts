@@ -33,7 +33,7 @@ export async function swap(
   fromAsset: Asset,
   toAsset: Asset,
   value: BigNumber.Value,
-  slippageTolerance: BigNumber.Value
+  slippageTolerance: BigNumber.Value = 0
 ) {
   const fromAccount = await tezos.signer.publicKeyHash();
 
