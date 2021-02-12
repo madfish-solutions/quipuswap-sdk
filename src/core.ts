@@ -105,6 +105,41 @@ export async function swap(
   }
 }
 
+export async function estimateSwap(
+  tezos: TezosToolkit,
+  factories: Factories,
+  fromAsset: Asset,
+  toAsset: Asset,
+  value: BigNumber.Value
+) {
+  if (isXTZAsset(fromAsset) && isTokenAsset(toAsset)) {
+    const dex = await findDex(tezos, factories, toAsset);
+    const dexStorage = await dex.storage();
+
+    return estimateTezToToken(dexStorage, value);
+  } else if (isTokenAsset(fromAsset) && isXTZAsset(toAsset)) {
+    const dex = await findDex(tezos, factories, fromAsset);
+    const dexStorage = await dex.storage();
+
+    return estimateTokenToTez(dexStorage, value);
+  } else if (isTokenAsset(fromAsset) && isTokenAsset(toAsset)) {
+    const [inputDex, outputDex] = await Promise.all([
+      findDex(tezos, factories, fromAsset),
+      findDex(tezos, factories, toAsset),
+    ]);
+
+    const [inputDexStorage, outputDexStorage] = await Promise.all([
+      inputDex.storage(),
+      outputDex.storage(),
+    ]);
+
+    const intermediateTezValue = estimateTokenToTez(inputDexStorage, value);
+    return estimateTokenToTez(outputDexStorage, intermediateTezValue);
+  } else {
+    throw new Error("Unsupported exchange way");
+  }
+}
+
 export async function initializeLiquidity(
   tezos: TezosToolkit,
   factories: Factories,
