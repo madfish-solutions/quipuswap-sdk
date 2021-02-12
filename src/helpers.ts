@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import { TezosToolkit, OpKind } from "@taquito/taquito";
+import { TezosToolkit, Signer, OpKind } from "@taquito/taquito";
 import {
   OperationOptions,
   Batch,
@@ -64,5 +64,27 @@ export function isTokenAsset(asset: Asset): asset is Token {
 export function assertNat(val: BigNumber) {
   if (!val.isInteger() || val.isNegative()) {
     throw new Error("Value is not non-negative natural number");
+  }
+}
+
+export class ReadOnlySigner implements Signer {
+  constructor(private pkh: string, private pk: string) {}
+
+  async publicKeyHash() {
+    return this.pkh;
+  }
+  async publicKey() {
+    return this.pk;
+  }
+  async secretKey(): Promise<string> {
+    throw new Error("Secret key cannot be exposed");
+  }
+  async sign(): Promise<{
+    bytes: string;
+    sig: string;
+    prefixSig: string;
+    sbytes: string;
+  }> {
+    throw new Error("Cannot sign");
   }
 }
