@@ -18,8 +18,8 @@ import {
 } from "./helpers";
 import { Factory, Dex, FA1_2, FA2 } from "./contracts";
 import {
-  estimateSharesInTez,
-  estimateSharesInToken,
+  estimateTokenInTez,
+  estimateTezInToken,
   estimateTezInShares,
   estimateTezToToken,
   estimateTokenInShares,
@@ -168,12 +168,10 @@ export async function addLiquidity(
     tezValue = values.tezValue;
   } else if ("tokenValue" in values) {
     tokenValue = values.tokenValue;
-    const shares = estimateSharesInToken(dexStorage, tokenValue);
-    tezValue = estimateTezInShares(dexStorage, shares).plus(1);
+    tezValue = estimateTezInToken(dexStorage, tokenValue);
   } else {
     tezValue = values.tezValue;
-    const shares = estimateSharesInTez(dexStorage, tezValue);
-    tokenValue = estimateTokenInShares(dexStorage, shares).plus(1);
+    tokenValue = estimateTokenInTez(dexStorage, tezValue);
   }
 
   const fromAccount = await tezos.signer.publicKeyHash();

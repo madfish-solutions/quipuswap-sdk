@@ -126,3 +126,26 @@ export function estimateTokenInShares(
     .times(dexStorage.storage.token_pool)
     .idiv(dexStorage.storage.total_supply);
 }
+
+export function estimateTokenInTez(dexStorage: any, tezValue: BigNumber.Value) {
+  const tezValueBN = new BigNumber(tezValue);
+  assertNat(tezValueBN);
+  if (tezValueBN.isZero()) return new BigNumber(0);
+
+  return tezValueBN
+    .times(dexStorage.storage.token_pool)
+    .idiv(dexStorage.storage.tez_pool);
+}
+
+export function estimateTezInToken(
+  dexStorage: any,
+  tokenValue: BigNumber.Value
+) {
+  const tokenValueBN = new BigNumber(tokenValue);
+  assertNat(tokenValueBN);
+  if (tokenValueBN.isZero()) return new BigNumber(0);
+
+  return tokenValueBN
+    .times(dexStorage.storage.tez_pool)
+    .idiv(dexStorage.storage.token_pool);
+}
