@@ -75,7 +75,7 @@ export async function swap(
       halfSlippageTolerance
     );
     const finalValueToMin = withSlippage(
-      estimateTokenToTez(outputDexStorage, intermediateValueToMin),
+      estimateTezToToken(outputDexStorage, intermediateValueToMin),
       halfSlippageTolerance
     );
 
@@ -134,7 +134,7 @@ export async function estimateSwap(
     ]);
 
     const intermediateTezValue = estimateTokenToTez(inputDexStorage, value);
-    return estimateTokenToTez(outputDexStorage, intermediateTezValue);
+    return estimateTezToToken(outputDexStorage, intermediateTezValue);
   } else {
     throw new Error("Unsupported exchange way");
   }
