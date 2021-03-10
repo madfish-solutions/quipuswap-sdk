@@ -24,6 +24,8 @@ import {
   estimateTezToToken,
   estimateTokenInShares,
   estimateTokenToTez,
+  estimateTezToTokenInverse,
+  estimateTokenToTezInverse,
 } from "./estimates";
 
 export async function swap(
@@ -110,18 +112,22 @@ export async function estimateSwap(
   factories: Factories,
   fromAsset: Asset,
   toAsset: Asset,
-  value: BigNumber.Value
+  values: { inputValue: BigNumber.Value } | { outputValue: BigNumber.Value }
 ) {
   if (isXTZAsset(fromAsset) && isTokenAsset(toAsset)) {
     const dex = await findDex(tezos, factories, toAsset);
     const dexStorage = await dex.storage();
 
-    return estimateTezToToken(dexStorage, value);
+    return "outputValue" in values
+      ? estimateTezToTokenInverse(dexStorage, values.outputValue)
+      : estimateTezToToken(dexStorage, values.inputValue);
   } else if (isTokenAsset(fromAsset) && isXTZAsset(toAsset)) {
     const dex = await findDex(tezos, factories, fromAsset);
     const dexStorage = await dex.storage();
 
-    return estimateTokenToTez(dexStorage, value);
+    return "outputValue" in values
+      ? estimateTokenToTezInverse(dexStorage, values.outputValue)
+      : estimateTokenToTez(dexStorage, values.inputValue);
   } else if (isTokenAsset(fromAsset) && isTokenAsset(toAsset)) {
     const [inputDex, outputDex] = await Promise.all([
       findDex(tezos, factories, fromAsset),
@@ -133,8 +139,19 @@ export async function estimateSwap(
       outputDex.storage(),
     ]);
 
-    const intermediateTezValue = estimateTokenToTez(inputDexStorage, value);
-    return estimateTezToToken(outputDexStorage, intermediateTezValue);
+    if ("outputValue" in values) {
+      const intermediateTezValue = estimateTezToTokenInverse(
+        outputDexStorage,
+        values.outputValue
+      );
+      return estimateTokenToTezInverse(inputDexStorage, intermediateTezValue);
+    } else {
+      const intermediateTezValue = estimateTokenToTez(
+        inputDexStorage,
+        values.inputValue
+      );
+      return estimateTezToToken(outputDexStorage, intermediateTezValue);
+    }
   } else {
     throw new Error("Unsupported exchange way");
   }
