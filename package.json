@@ -26,9 +26,7 @@
     "build": "tsdx build",
     "test": "tsdx test",
     "lint": "tsdx lint",
-    "prepare": "tsdx build",
-    "size": "size-limit",
-    "analyze": "size-limit --why"
+    "prepare": "tsdx build"
   },
   "dependencies": {
     "bignumber.js": "^9.0.1"
@@ -37,10 +35,8 @@
     "@taquito/taquito": "^8.0.0-beta"
   },
   "devDependencies": {
-    "@size-limit/preset-small-lib": "^4.10.1",
     "@taquito/taquito": "^8.0.6-beta.0",
     "husky": "^4.3.8",
-    "size-limit": "^4.10.1",
     "tsdx": "^0.14.1",
     "tslib": "^2.1.0",
     "typescript": "^3.7.3"
@@ -60,15 +56,5 @@
   "prettier": {
     "trailingComma": "es5",
     "arrowParens": "always"
-  },
-  "size-limit": [
-    {
-      "path": "dist/quipuswap-sdk.cjs.production.min.js",
-      "limit": "10 KB"
-    },
-    {
-      "path": "dist/quipuswap-sdk.esm.js",
-      "limit": "10 KB"
-    }
-  ]
+  }
 }
