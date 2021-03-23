@@ -56,6 +56,10 @@
       "pre-commit": "tsdx lint"
     }
   },
+  "prettier": {
+    "trailingComma": "es5",
+    "arrowParens": "always"
+  },
   "size-limit": [
     {
       "path": "dist/quipuswap-sdk.cjs.production.min.js",
