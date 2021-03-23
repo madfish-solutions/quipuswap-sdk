@@ -1,7 +1,7 @@
-import { sum } from "../src";
+import { isXTZAsset } from "../src";
 
-describe("blah", () => {
+describe("isXTZAsset", () => {
   it("works", () => {
-    expect(sum(1, 1)).toEqual(2);
+    expect(isXTZAsset("xtz")).toBeTruthy();
   });
 });

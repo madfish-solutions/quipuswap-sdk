@@ -60,7 +60,9 @@ export async function swap(
       Dex.tokenToTezPayment(dex, value, valueToMin, toAccount),
     ]);
   } else if (isTokenAsset(fromAsset) && isTokenAsset(toAsset)) {
-    const halfSlippageTolerance = new BigNumber(slippageTolerance).div(2);
+    const halfSlippageTolerance = new BigNumber(1).minus(
+      new BigNumber(1).minus(slippageTolerance).sqrt()
+    );
 
     const [inputDex, outputDex] = await Promise.all([
       findDex(tezos, factories, fromAsset),
