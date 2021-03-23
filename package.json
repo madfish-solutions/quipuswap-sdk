@@ -43,10 +43,11 @@
     "size-limit": "^4.10.1",
     "tsdx": "^0.14.1",
     "tslib": "^2.1.0",
-    "typescript": "^4.2.3"
+    "typescript": "^3.7.3"
   },
   "resolutions": {
-    "elliptic": "^6.5.4"
+    "elliptic": "^6.5.4",
+    "prettier": "^2.2.1"
   },
   "engines": {
     "node": ">=10"
