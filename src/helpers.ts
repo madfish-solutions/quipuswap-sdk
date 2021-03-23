@@ -7,7 +7,7 @@ import {
   Token,
   FA2Token,
   Asset,
-  ContractOrAddress,
+  ContractOrAddress
 } from "./types";
 
 export function fromOpOpts(
@@ -17,7 +17,7 @@ export function fromOpOpts(
   return {
     mutez: true,
     value: tezValue,
-    ...opts,
+    ...opts
   } as any;
 }
 
@@ -30,7 +30,7 @@ export function estimateTransfers(
   transfers: TransferParams[]
 ) {
   return tezos.estimate.batch(
-    transfers.map((tParams) => ({ kind: OpKind.TRANSACTION, ...tParams }))
+    transfers.map(tParams => ({ kind: OpKind.TRANSACTION, ...tParams }))
   );
 }
 

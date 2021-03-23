@@ -5,7 +5,7 @@ import { fromOpOpts } from "../helpers";
 export enum Errors {
   NotEnoughBalance = "NotEnoughBalance",
   NotEnoughAllowance = "NotEnoughAllowance",
-  UnsafeAllowanceChange = "UnsafeAllowanceChange",
+  UnsafeAllowanceChange = "UnsafeAllowanceChange"
 }
 
 export function transfer(
