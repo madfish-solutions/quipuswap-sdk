@@ -6,7 +6,7 @@ import {
   Factories,
   TransferParams,
   Contract,
-  ContractOrAddress
+  ContractOrAddress,
 } from "./types";
 import {
   isFA2Token,
@@ -14,7 +14,7 @@ import {
   isTokenAsset,
   toContract,
   toContractAddress,
-  estimateTransfers
+  estimateTransfers,
 } from "./helpers";
 import { Factory, Dex, FA1_2, FA2 } from "./contracts";
 import {
@@ -25,7 +25,7 @@ import {
   estimateTokenInShares,
   estimateTokenToTez,
   estimateTezToTokenInverse,
-  estimateTokenToTezInverse
+  estimateTokenToTezInverse,
 } from "./estimates";
 
 export async function swap(
@@ -57,7 +57,7 @@ export async function swap(
     );
 
     return withTokenApprove(tezos, fromAsset, fromAccount, dex.address, value, [
-      Dex.tokenToTezPayment(dex, value, valueToMin, toAccount)
+      Dex.tokenToTezPayment(dex, value, valueToMin, toAccount),
     ]);
   } else if (isTokenAsset(fromAsset) && isTokenAsset(toAsset)) {
     const halfSlippageTolerance = new BigNumber(1).minus(
@@ -66,12 +66,12 @@ export async function swap(
 
     const [inputDex, outputDex] = await Promise.all([
       findDex(tezos, factories, fromAsset),
-      findDex(tezos, factories, toAsset)
+      findDex(tezos, factories, toAsset),
     ]);
 
     const [inputDexStorage, outputDexStorage] = await Promise.all([
       inputDex.storage(),
-      outputDex.storage()
+      outputDex.storage(),
     ]);
 
     const intermediateValueToMin = withSlippage(
@@ -101,7 +101,7 @@ export async function swap(
           intermediateValueToMin,
           finalValueToMin,
           toAccount
-        )
+        ),
       ]
     );
   } else {
@@ -133,12 +133,12 @@ export async function estimateSwap(
   } else if (isTokenAsset(fromAsset) && isTokenAsset(toAsset)) {
     const [inputDex, outputDex] = await Promise.all([
       findDex(tezos, factories, fromAsset),
-      findDex(tezos, factories, toAsset)
+      findDex(tezos, factories, toAsset),
     ]);
 
     const [inputDexStorage, outputDexStorage] = await Promise.all([
       inputDex.storage(),
-      outputDex.storage()
+      outputDex.storage(),
     ]);
 
     if ("outputValue" in values) {
@@ -274,14 +274,14 @@ export async function removeLiquidity(
 export function toLPToken(dex: ContractOrAddress, dexStorage: any): Token {
   return {
     contract: dex,
-    id: "token_id" in dexStorage.storage ? 0 : undefined
+    id: "token_id" in dexStorage.storage ? 0 : undefined,
   };
 }
 
 export function getDexToken(dexStorage: any): Token {
   return {
     contract: dexStorage.storage.token_address,
-    id: dexStorage.storage.token_id
+    id: dexStorage.storage.token_id,
   };
 }
 
@@ -355,8 +355,8 @@ export async function withTokenApprove(
           type: "add_operator",
           from,
           to,
-          tokenId: token.id
-        }
+          tokenId: token.id,
+        },
       ]),
       ...transfers,
       FA2.updateOperators(tokenContract, [
@@ -364,9 +364,9 @@ export async function withTokenApprove(
           type: "remove_operator",
           from,
           to,
-          tokenId: token.id
-        }
-      ])
+          tokenId: token.id,
+        },
+      ]),
     ];
   }
 

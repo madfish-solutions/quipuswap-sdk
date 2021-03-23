@@ -3,7 +3,7 @@ import {
   ContractAbstraction,
   ContractProvider,
   Wallet,
-  WalletOperationBatch
+  WalletOperationBatch,
 } from "@taquito/taquito";
 import { OperationBatch } from "@taquito/taquito/dist/types/batch/rpc-batch-provider";
 
