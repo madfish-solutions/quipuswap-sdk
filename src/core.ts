@@ -31,13 +31,14 @@ import {
 export async function swap(
   tezos: TezosToolkit,
   factories: Factories,
-  toAccount: string,
   fromAsset: Asset,
   toAsset: Asset,
   value: BigNumber.Value,
-  slippageTolerance: BigNumber.Value = 0
+  slippageTolerance: BigNumber.Value = 0,
+  toAccount?: string
 ) {
   const fromAccount = await tezos.signer.publicKeyHash();
+  if (!toAccount) toAccount = fromAccount;
 
   if (isXTZAsset(fromAsset) && isTokenAsset(toAsset)) {
     const dex = await findDex(tezos, factories, toAsset);
