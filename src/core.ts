@@ -249,8 +249,8 @@ export async function removeLiquidity(
 ) {
   const dexContract = await toContract(tezos, dex);
   const dexStorage = await dexContract.storage();
-
   const lpToken = toLPToken(dexContract, dexStorage);
+
   const tokenValueMin = withSlippage(
     estimateTokenInShares(dexStorage, lpTokenValue),
     slippageTolerance
@@ -269,6 +269,51 @@ export async function removeLiquidity(
     dexContract.address,
     lpTokenValue,
     [Dex.divestLiquidity(dexContract, lpTokenValue, tokenValueMin, tezValueMin)]
+  );
+}
+
+export async function voteForBaker(
+  tezos: TezosToolkit,
+  dex: ContractOrAddress,
+  bakerAddress: string,
+  lpTokenValue: BigNumber.Value
+) {
+  const dexContract = await toContract(tezos, dex);
+  const dexStorage = await dexContract.storage();
+  const lpToken = toLPToken(dexContract, dexStorage);
+
+  const fromAccount = await tezos.signer.publicKeyHash();
+  const voter = fromAccount;
+
+  return withTokenApprove(
+    tezos,
+    lpToken,
+    fromAccount,
+    dexContract.address,
+    lpTokenValue,
+    [Dex.vote(dexContract, voter, bakerAddress, lpTokenValue)]
+  );
+}
+
+export async function vetoCurrentBaker(
+  tezos: TezosToolkit,
+  dex: ContractOrAddress,
+  lpTokenValue: BigNumber.Value
+) {
+  const dexContract = await toContract(tezos, dex);
+  const dexStorage = await dexContract.storage();
+  const lpToken = toLPToken(dexContract, dexStorage);
+
+  const fromAccount = await tezos.signer.publicKeyHash();
+  const voter = fromAccount;
+
+  return withTokenApprove(
+    tezos,
+    lpToken,
+    fromAccount,
+    dexContract.address,
+    lpTokenValue,
+    [Dex.veto(dexContract, voter, lpTokenValue)]
   );
 }
 
