@@ -53,12 +53,12 @@ export function isFA2Token(token: Token): token is FA2Token {
   return typeof token.id !== "undefined";
 }
 
-export function isXTZAsset(asset: Asset): asset is "xtz" {
-  return asset === "xtz";
+export function isTezAsset(asset: Asset): asset is "tez" {
+  return asset === "tez";
 }
 
 export function isTokenAsset(asset: Asset): asset is Token {
-  return asset !== "xtz";
+  return asset !== "tez";
 }
 
 export function assertNat(val: BigNumber) {

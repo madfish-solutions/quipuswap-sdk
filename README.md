@@ -1,3 +1,75 @@
+# Quipuswap SDK
+
+## Install
+
+```bash
+yarn add @taquito/taquito @quipuswap/sdk
+```
+
+## Usage
+
+### Configure
+
+```typescript
+import { TezosToolkit } from "@taquito/taquito";
+import { ReadOnlySigner } from "@quipuswap/sdk";
+
+const publicKeyHash = "tz1fVQangAfb9J1hRRMP2bSB6LvASD6KpY8A";
+const publicKey = "edpkvWbk81uh1DEvdWKR4g1bjyTGhdu1mDvznPUFE2zDwNsLXrEb9K";
+
+const tezos = new TezosToolkit("https://florencenet.smartpy.io");
+tezos.setSignerProvider(new ReadOnlySigner(publicKeyHash, publicKey));
+
+// Or if you using `privateKey`
+import { InMemorySigner } from "@taquito/signer";
+
+tezos.setSignerProvider(new InMemorySigner.fromSecretKey(privateKey));
+```
+
+### Swap
+
+```typescript
+import { swap, batchify } from "@quipuswap/sdk";
+
+const tezos = new TezosToolkit();
+const factories = {
+  fa1_2Factory: "KT1WkKiDSsDttdWrfZgcQ6Z9e3Cp4unHP2CP",
+  fa2Factory: "KT1Bps1VtszT2T3Yvxm5PJ6Rx2nk1FykWPdU",
+};
+
+(async () => {
+  try {
+    const fromAsset = "tez";
+    const toAsset = {
+      contract: "KT1RX7AdYr9hFZPQTZw5Fu8KkMwVtobHpTp6",
+      id: 0
+    };
+    const inputValue = 10_000_000; // in mutez (without decimals)
+    const slippageTolerance = 0.005; // 0.5%
+
+    const swapTransferParams = await swap(
+      tezos,
+      factories,
+      fromAsset
+      toAsset,
+      inputValue,
+      slippageTolerance
+    );
+
+    const op = await batchify(
+      tezos.wallet.batch([]),
+      swapTransferParams
+    ).send();
+
+    console.info(op.hash);
+    await op.confirmation();
+    console.info("Complete");
+  } catch (err) {
+    console.error(err);
+  }
+})();
+```
+
 # TSDX User Guide
 
 Congrats! You just saved yourself hours of work by bootstrapping this project with TSDX. Let’s get you oriented with what’s here and how to use it.
@@ -76,7 +148,7 @@ declare var __DEV__: boolean;
 
 // inside your code...
 if (__DEV__) {
-  console.log('foo');
+  console.log("foo");
 }
 ```
 

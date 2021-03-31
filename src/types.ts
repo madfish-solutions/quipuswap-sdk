@@ -31,7 +31,7 @@ export interface FA2Token extends Token {
   id: BigNumber.Value;
 }
 
-export type Asset = Token | "xtz";
+export type Asset = Token | "tez";
 
 export interface Factories {
   fa1_2Factory: ContractOrAddress;

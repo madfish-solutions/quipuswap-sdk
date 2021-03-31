@@ -10,7 +10,7 @@ import {
 } from "./types";
 import {
   isFA2Token,
-  isXTZAsset,
+  isTezAsset,
   isTokenAsset,
   toContract,
   toContractAddress,
@@ -40,7 +40,7 @@ export async function swap(
   const fromAccount = await tezos.signer.publicKeyHash();
   if (!toAccount) toAccount = fromAccount;
 
-  if (isXTZAsset(fromAsset) && isTokenAsset(toAsset)) {
+  if (isTezAsset(fromAsset) && isTokenAsset(toAsset)) {
     const dex = await findDex(tezos, factories, toAsset);
     const dexStorage = await dex.storage();
     const valueToMin = withSlippage(
@@ -49,7 +49,7 @@ export async function swap(
     );
 
     return [Dex.tezToTokenPayment(dex, value, valueToMin, toAccount)];
-  } else if (isTokenAsset(fromAsset) && isXTZAsset(toAsset)) {
+  } else if (isTokenAsset(fromAsset) && isTezAsset(toAsset)) {
     const dex = await findDex(tezos, factories, fromAsset);
     const dexStorage = await dex.storage();
     const valueToMin = withSlippage(
@@ -117,14 +117,14 @@ export async function estimateSwap(
   toAsset: Asset,
   values: { inputValue: BigNumber.Value } | { outputValue: BigNumber.Value }
 ) {
-  if (isXTZAsset(fromAsset) && isTokenAsset(toAsset)) {
+  if (isTezAsset(fromAsset) && isTokenAsset(toAsset)) {
     const dex = await findDex(tezos, factories, toAsset);
     const dexStorage = await dex.storage();
 
     return "outputValue" in values
       ? estimateTezToTokenInverse(dexStorage, values.outputValue)
       : estimateTezToToken(dexStorage, values.inputValue);
-  } else if (isTokenAsset(fromAsset) && isXTZAsset(toAsset)) {
+  } else if (isTokenAsset(fromAsset) && isTezAsset(toAsset)) {
     const dex = await findDex(tezos, factories, fromAsset);
     const dexStorage = await dex.storage();
 

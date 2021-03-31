@@ -1,7 +1,7 @@
-import { isXTZAsset } from "../src";
+import { isTezAsset } from "../src";
 
-describe("isXTZAsset", () => {
+describe("isTezAsset", () => {
   it("works", () => {
-    expect(isXTZAsset("xtz")).toBeTruthy();
+    expect(isTezAsset("tez")).toBeTruthy();
   });
 });
