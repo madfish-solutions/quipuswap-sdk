@@ -422,7 +422,7 @@ export async function withTokenApprove(
   try {
     await estimateTransfers(tezos, [approveParams]);
   } catch (err) {
-    if (err?.message === FA1_2.Errors.UnsafeAllowanceChange) {
+    if (isUnsafeAllowanceChangeError(err)) {
       resetApprove = true;
     }
   }
@@ -430,6 +430,22 @@ export async function withTokenApprove(
   return resetApprove
     ? [FA1_2.approve(tokenContract, to, 0), approveParams, ...transfers]
     : [approveParams, ...transfers];
+}
+
+export function isUnsafeAllowanceChangeError(err: any): boolean {
+  try {
+    return (
+      err?.message === FA1_2.Errors.UnsafeAllowanceChange ||
+      err?.errors?.some(
+        (e: any) =>
+          e?.with?.int === "23" ||
+          e?.with?.string === FA1_2.Errors.UnsafeAllowanceChange ||
+          e?.with?.args?.[0]?.string === FA1_2.Errors.UnsafeAllowanceChange
+      )
+    );
+  } catch {
+    return false;
+  }
 }
 
 export function withSlippage(val: BigNumber.Value, tolerance: BigNumber.Value) {
