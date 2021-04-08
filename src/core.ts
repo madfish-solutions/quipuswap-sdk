@@ -272,6 +272,15 @@ export async function removeLiquidity(
   );
 }
 
+export async function withdrawReward(
+  tezos: TezosToolkit,
+  dex: ContractOrAddress,
+  receiver: string
+) {
+  const dexContract = await toContract(tezos, dex);
+  return [Dex.withdrawProfit(dexContract, receiver)];
+}
+
 export async function voteForBaker(
   tezos: TezosToolkit,
   dex: ContractOrAddress,
