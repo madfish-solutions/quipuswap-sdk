@@ -11,13 +11,14 @@ yarn add @taquito/taquito @quipuswap/sdk
 ### Configure
 
 ```typescript
-import { TezosToolkit } from "@taquito/taquito";
+import { TezosToolkit, MichelCodecPacker } from "@taquito/taquito";
 import { ReadOnlySigner } from "@quipuswap/sdk";
 
 const publicKeyHash = "tz1fVQangAfb9J1hRRMP2bSB6LvASD6KpY8A";
 const publicKey = "edpkvWbk81uh1DEvdWKR4g1bjyTGhdu1mDvznPUFE2zDwNsLXrEb9K";
 
 const tezos = new TezosToolkit("https://florencenet.smartpy.io");
+tezos.setPackerProvider(new MichelCodecPacker());
 tezos.setSignerProvider(new ReadOnlySigner(publicKeyHash, publicKey));
 
 // Or if you using `privateKey`
@@ -31,7 +32,8 @@ tezos.setSignerProvider(new InMemorySigner.fromSecretKey(privateKey));
 ```typescript
 import { swap, batchify } from "@quipuswap/sdk";
 
-const tezos = new TezosToolkit();
+const tezos = new TezosToolkit(); // Full sample in "Configure" section
+
 const factories = {
   fa1_2Factory: "KT1WkKiDSsDttdWrfZgcQ6Z9e3Cp4unHP2CP",
   fa2Factory: "KT1Bps1VtszT2T3Yvxm5PJ6Rx2nk1FykWPdU",
@@ -47,7 +49,7 @@ const factories = {
     const inputValue = 10_000_000; // in mutez (without decimals)
     const slippageTolerance = 0.005; // 0.5%
 
-    const swapTransferParams = await swap(
+    const swapParams = await swap(
       tezos,
       factories,
       fromAsset
@@ -58,7 +60,188 @@ const factories = {
 
     const op = await batchify(
       tezos.wallet.batch([]),
-      swapTransferParams
+      swapParams
+    ).send();
+
+    console.info(op.hash);
+    await op.confirmation();
+    console.info("Complete");
+  } catch (err) {
+    console.error(err);
+  }
+})();
+```
+
+### Estimate swap
+
+```typescript
+import { estimateSwap } from "@quipuswap/sdk";
+
+const tezos = new TezosToolkit(); // Full sample in "Configure" section
+
+const factories = {
+  fa1_2Factory: "KT1WkKiDSsDttdWrfZgcQ6Z9e3Cp4unHP2CP",
+  fa2Factory: "KT1Bps1VtszT2T3Yvxm5PJ6Rx2nk1FykWPdU",
+};
+
+(async () => {
+  try {
+    const fromAsset = "tez";
+    const toAsset = {
+      contract: "KT1RX7AdYr9hFZPQTZw5Fu8KkMwVtobHpTp6",
+      id: 0
+    };
+    const inputValue = 10_000_000; // in mutez (without decimals)
+
+    const estimatedOutputValue = await estimateSwap(
+      tezos,
+      factories,
+      fromAsset
+      toAsset,
+      { inputValue }
+    );
+
+    console.info({ estimatedOutputValue });
+
+    const estimatedInputValue = await estimateSwap(
+      tezos,
+      factories,
+      fromAsset
+      toAsset,
+      { outputValue: estimatedOutputValue }
+    );
+
+    console.info({ estimatedInputValue });
+  } catch (err) {
+    console.error(err);
+  }
+})();
+```
+
+### Add liquidity
+
+```typescript
+import { findDex, addLiquidity } from "@quipuswap/sdk";
+
+const tezos = new TezosToolkit(); // Full sample in "Configure" section
+
+const factories = {
+  fa1_2Factory: "KT1WkKiDSsDttdWrfZgcQ6Z9e3Cp4unHP2CP",
+  fa2Factory: "KT1Bps1VtszT2T3Yvxm5PJ6Rx2nk1FykWPdU",
+};
+const token = {
+  contract: "KT1RX7AdYr9hFZPQTZw5Fu8KkMwVtobHpTp6",
+  id: 0,
+};
+
+(async () => {
+  try {
+    const dex = await findDex(tezos, factories, token);
+
+    const addLiquidityParams = await addLiquidity(
+      tezos,
+      dex,
+      { tezValue: 10_000_000 }
+      // or { tokenValue: 4_000 }
+      // or { tezValue: 10_000_000, tokenValue: 4_000 }
+      //
+      // @TIP:
+      // If one of the properties is omitted,
+      // it will estimate another automatically
+    );
+
+    const op = await batchify(
+      tezos.wallet.batch([]),
+      addLiquidityParams
+    ).send();
+
+    console.info(op.hash);
+    await op.confirmation();
+    console.info("Complete");
+  } catch (err) {
+    console.error(err);
+  }
+})();
+```
+
+### Remove liquidity
+
+```typescript
+import { findDex, removeLiquidity } from "@quipuswap/sdk";
+
+const tezos = new TezosToolkit(); // Full sample in "Configure" section
+
+const factories = {
+  fa1_2Factory: "KT1WkKiDSsDttdWrfZgcQ6Z9e3Cp4unHP2CP",
+  fa2Factory: "KT1Bps1VtszT2T3Yvxm5PJ6Rx2nk1FykWPdU",
+};
+const token = {
+  contract: "KT1RX7AdYr9hFZPQTZw5Fu8KkMwVtobHpTp6",
+  id: 0,
+};
+
+(async () => {
+  try {
+    const account = "tz1Lx...";
+    const slippageTolerance = 0.005; // 0.5%
+
+    const dex = await findDex(tezos, factories, token);
+    const share = await getLiquidityShare(tezos, dex, account);
+
+    const lpTokenValue = share.total;
+    const removeLiquidityParams = await removeLiquidity(
+      tezos,
+      dex,
+      lpTokenValue,
+      slippageTolerance
+    );
+
+    const op = await batchify(
+      tezos.wallet.batch([]),
+      removeLiquidityParams
+    ).send();
+
+    console.info(op.hash);
+    await op.confirmation();
+    console.info("Complete");
+  } catch (err) {
+    console.error(err);
+  }
+})();
+```
+
+### Initialize liquidity
+
+```typescript
+import { findDex, initializeLiquidity } from "@quipuswap/sdk";
+
+const tezos = new TezosToolkit(); // Full sample in "Configure" section
+
+const factories = {
+  fa1_2Factory: "KT1WkKiDSsDttdWrfZgcQ6Z9e3Cp4unHP2CP",
+  fa2Factory: "KT1Bps1VtszT2T3Yvxm5PJ6Rx2nk1FykWPdU",
+};
+const token = {
+  contract: "KT1RX7AdYr9hFZPQTZw5Fu8KkMwVtobHpTp6",
+  id: 0,
+};
+
+(async () => {
+  try {
+    const tokenValue = 4_000;
+    const tezValue = 10_000_000;
+
+    const initializeLiquidityParams = await initializeLiquidity(
+      tezos,
+      factories,
+      token,
+      tokenValue,
+      tezValue
+    );
+
+    const op = await batchify(
+      tezos.wallet.batch([]),
+      initializeLiquidityParams
     ).send();
 
     console.info(op.hash);
