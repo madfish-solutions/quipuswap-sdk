@@ -27,6 +27,7 @@ import {
   estimateTezToTokenInverse,
   estimateTokenToTezInverse,
 } from "./estimates";
+import { ACCURANCY_MULTIPLIER, VOTING_PERIOD } from "./defaults";
 
 export async function swap(
   tezos: TezosToolkit,
@@ -295,6 +296,56 @@ export async function getLiquidityShare(
     frozen,
     total: unfrozen.plus(frozen),
   };
+}
+
+export async function estimateReward(
+  tezos: TezosToolkit,
+  dex: ContractOrAddress,
+  account: string
+) {
+  const dexContract = await toContract(tezos, dex);
+  const { storage } = await dexContract.storage<any>();
+  const [rewards, shares] = await Promise.all([
+    storage.user_rewards.get(account),
+    storage.ledger.get(account),
+  ]);
+
+  let reward = new BigNumber(rewards?.reward ?? 0);
+  if (shares) {
+    const now = new Date();
+    const periodFinish = new Date(storage.period_finish);
+    const lastUpdateTime = new Date(storage.last_update_time);
+    const rewardsTime = now > periodFinish ? periodFinish : now;
+    let newReward = new BigNumber(
+      Math.abs(+rewardsTime - +lastUpdateTime)
+    ).times(storage.reward_per_sec);
+
+    if (now > periodFinish) {
+      const periodsDuration = new BigNumber(+now - +periodFinish)
+        .idiv(VOTING_PERIOD)
+        .plus(1)
+        .times(VOTING_PERIOD);
+      const rewardPerSec = new BigNumber(storage.reward)
+        .times(ACCURANCY_MULTIPLIER)
+        .idiv(periodsDuration.abs());
+      newReward = new BigNumber(+now - +periodFinish).abs().times(rewardPerSec);
+    }
+
+    const rewardPerShare = new BigNumber(storage.reward_per_share).plus(
+      newReward.idiv(storage.total_supply)
+    );
+    const totalShares = new BigNumber(shares.balance).plus(
+      shares.frozen_balance
+    );
+    reward = reward.plus(
+      totalShares
+        .times(rewardPerShare)
+        .minus(rewards?.reward_paid ?? 0)
+        .abs()
+    );
+  }
+
+  return reward.idiv(ACCURANCY_MULTIPLIER);
 }
 
 export async function withdrawReward(
