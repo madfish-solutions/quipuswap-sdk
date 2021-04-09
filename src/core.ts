@@ -272,6 +272,31 @@ export async function removeLiquidity(
   );
 }
 
+export async function getLiquidityShare(
+  tezos: TezosToolkit,
+  dex: ContractOrAddress,
+  account: string
+) {
+  const dexContract = await toContract(tezos, dex);
+  const dexStorage = await dexContract.storage<any>();
+  const val = await dexStorage.storage.ledger.get(account);
+  if (!val) {
+    return {
+      unfrozen: new BigNumber(0),
+      frozen: new BigNumber(0),
+      total: new BigNumber(0),
+    };
+  }
+
+  const unfrozen = new BigNumber(val.balance);
+  const frozen = new BigNumber(val.frozen_balance);
+  return {
+    unfrozen,
+    frozen,
+    total: unfrozen.plus(frozen),
+  };
+}
+
 export async function withdrawReward(
   tezos: TezosToolkit,
   dex: ContractOrAddress,

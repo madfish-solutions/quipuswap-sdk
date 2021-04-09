@@ -16,13 +16,19 @@ export function fromOpOpts(
 ) {
   return {
     mutez: true,
-    value: tezValue,
+    amount: tezValue,
     ...opts,
   } as any;
 }
 
-export function batchify(batch: Batch, transfers: TransferParams[]) {
-  return transfers.reduce((b, tParams) => b.withTransfer(tParams), batch);
+export function batchify<B extends Batch>(
+  batch: B,
+  transfers: TransferParams[]
+): B {
+  for (const tParams of transfers) {
+    batch.withTransfer(tParams);
+  }
+  return batch;
 }
 
 export function estimateTransfers(

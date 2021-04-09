@@ -9,7 +9,7 @@ export function initializeExchange(
   opts?: OperationOptions
 ) {
   return dex.methods
-    .use("initializeExchange", tokenValue)
+    .initializeExchange(tokenValue)
     .toTransferParams(fromOpOpts(tezValue, opts));
 }
 
@@ -21,7 +21,7 @@ export function tezToTokenPayment(
   opts?: OperationOptions
 ) {
   return dex.methods
-    .use("tezToTokenPayment", tokenValueMin, receiver)
+    .tezToTokenPayment(tokenValueMin, receiver)
     .toTransferParams(fromOpOpts(tezValue, opts));
 }
 
@@ -33,7 +33,7 @@ export function tokenToTezPayment(
   opts?: OperationOptions
 ) {
   return dex.methods
-    .use("tokenToTezPayment", tokenValue, tezValueMin, receiver)
+    .tokenToTezPayment(tokenValue, tezValueMin, receiver)
     .toTransferParams(fromOpOpts(undefined, opts));
 }
 
@@ -43,7 +43,7 @@ export function withdrawProfit(
   opts?: OperationOptions
 ) {
   return dex.methods
-    .use("withdrawProfit", receiver)
+    .withdrawProfit(receiver)
     .toTransferParams(fromOpOpts(undefined, opts));
 }
 
@@ -54,7 +54,7 @@ export function investLiquidity(
   opts?: OperationOptions
 ) {
   return dex.methods
-    .use("investLiquidity", tokenValue)
+    .investLiquidity(tokenValue)
     .toTransferParams(fromOpOpts(tezValue, opts));
 }
 
@@ -66,7 +66,7 @@ export function divestLiquidity(
   opts?: OperationOptions
 ) {
   return dex.methods
-    .use("investLiquidity", tezValueMin, tokenValueMin, shares)
+    .investLiquidity(tezValueMin, tokenValueMin, shares)
     .toTransferParams(fromOpOpts(undefined, opts));
 }
 
@@ -78,7 +78,7 @@ export function vote(
   opts?: OperationOptions
 ) {
   return dex.methods
-    .use("vote", baker, shares, voter)
+    .vote(baker, shares, voter)
     .toTransferParams(fromOpOpts(undefined, opts));
 }
 
@@ -89,6 +89,6 @@ export function veto(
   opts?: OperationOptions
 ) {
   return dex.methods
-    .use("veto", shares, voter)
+    .veto(shares, voter)
     .toTransferParams(fromOpOpts(undefined, opts));
 }
