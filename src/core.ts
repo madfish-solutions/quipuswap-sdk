@@ -238,7 +238,10 @@ export async function addLiquidity(
     fromAccount,
     dexContract.address,
     tokenValue,
-    [Dex.investLiquidity(dexContract, tokenValue, tezValue)]
+    [
+      Dex.investLiquidity(dexContract, tokenValue, tezValue),
+      Dex.withdrawProfit(dexContract, fromAccount),
+    ]
   );
 }
 
