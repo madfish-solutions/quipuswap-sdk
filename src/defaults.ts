@@ -1,4 +1,4 @@
-export const FEE_RATE = 333;
+export const FEE_FACTOR = 997;
 export const VETO_PERIOD = 7889229;
 export const VOTING_PERIOD = 2592000;
 export const ACCURANCY_MULTIPLIER = 1000000000000000;

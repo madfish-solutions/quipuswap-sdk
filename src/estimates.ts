@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import { assertNat } from "./helpers";
-import { FEE_RATE } from "./defaults";
+import { FEE_FACTOR } from "./defaults";
 
 export function estimateTezToToken(
   dexStorage: any,
@@ -10,33 +10,12 @@ export function estimateTezToToken(
   assertNat(tezValueBN);
   if (tezValueBN.isZero()) return new BigNumber(0);
 
-  const fee = tezValueBN.idiv(FEE_RATE);
-  const newTezPool = tezValueBN.plus(dexStorage.storage.tez_pool);
-  const tempTezPool = newTezPool.minus(fee);
-  const newTokenPool = new BigNumber(dexStorage.storage.invariant).idiv(
-    tempTezPool
-  );
-  return new BigNumber(dexStorage.storage.token_pool).minus(newTokenPool);
-}
-
-export function estimateTezToTokenInverse(
-  dexStorage: any,
-  tokenValue: BigNumber.Value
-) {
-  const tokenValueBN = new BigNumber(tokenValue);
-  assertNat(tokenValueBN);
-  if (tokenValueBN.isZero()) return new BigNumber(0);
-
-  const newTokenPool = new BigNumber(dexStorage.storage.token_pool).minus(
-    tokenValueBN
-  );
-  const tempTezPool = new BigNumber(dexStorage.storage.invariant).idiv(
-    newTokenPool
-  );
-  const fee = tempTezPool
-    .minus(dexStorage.storage.tez_pool)
-    .idiv(new BigNumber(FEE_RATE).minus(1));
-  return fee.times(FEE_RATE);
+  const tezInWithFee = new BigNumber(tezValue).times(FEE_FACTOR);
+  const numerator = tezInWithFee.times(dexStorage.storage.token_pool);
+  const denominator = new BigNumber(dexStorage.storage.tez_pool)
+    .times(1000)
+    .plus(tezInWithFee);
+  return numerator.idiv(denominator);
 }
 
 export function estimateTokenToTez(
@@ -47,15 +26,29 @@ export function estimateTokenToTez(
   assertNat(tokenValueBN);
   if (tokenValueBN.isZero()) return new BigNumber(0);
 
-  const fee = tokenValueBN.idiv(FEE_RATE);
-  const newTokenPool = new BigNumber(dexStorage.storage.token_pool).plus(
-    tokenValueBN
-  );
-  const tempTokenPool = newTokenPool.minus(fee);
-  const newTezPool = new BigNumber(dexStorage.storage.invariant).idiv(
-    tempTokenPool
-  );
-  return new BigNumber(dexStorage.storage.tez_pool).minus(newTezPool);
+  const tokenInWithFee = new BigNumber(tokenValue).times(FEE_FACTOR);
+  const numerator = tokenInWithFee.times(dexStorage.storage.tez_pool);
+  const denominator = new BigNumber(dexStorage.storage.token_pool)
+    .times(1000)
+    .plus(tokenInWithFee);
+  return numerator.idiv(denominator);
+}
+
+export function estimateTezToTokenInverse(
+  dexStorage: any,
+  tokenValue: BigNumber.Value
+) {
+  const tokenValueBN = new BigNumber(tokenValue);
+  assertNat(tokenValueBN);
+  if (tokenValueBN.isZero()) return new BigNumber(0);
+
+  const numerator = new BigNumber(dexStorage.storage.tez_pool)
+    .times(1000)
+    .times(tokenValue);
+  const denominator = new BigNumber(dexStorage.storage.token_pool)
+    .minus(tokenValue)
+    .times(FEE_FACTOR);
+  return numerator.idiv(denominator).plus(1);
 }
 
 export function estimateTokenToTezInverse(
@@ -66,16 +59,13 @@ export function estimateTokenToTezInverse(
   assertNat(tezValueBN);
   if (tezValueBN.isZero()) return new BigNumber(0);
 
-  const newTezPool = new BigNumber(dexStorage.storage.tez_pool).minus(
-    tezValueBN
-  );
-  const tempTokenPool = new BigNumber(dexStorage.storage.invariant).idiv(
-    newTezPool
-  );
-  const fee = tempTokenPool
-    .minus(dexStorage.storage.token_pool)
-    .idiv(new BigNumber(FEE_RATE).minus(1));
-  return fee.times(FEE_RATE);
+  const numerator = new BigNumber(dexStorage.storage.token_pool)
+    .times(1000)
+    .times(tezValue);
+  const denominator = new BigNumber(dexStorage.storage.tez_pool)
+    .minus(tezValue)
+    .times(FEE_FACTOR);
+  return numerator.idiv(denominator).plus(1);
 }
 
 export function estimateSharesInTez(

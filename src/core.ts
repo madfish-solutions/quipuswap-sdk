@@ -435,7 +435,10 @@ export async function isDexExistAndContainsLiquidity(
 
 export async function isDexContainsLiquidity(dex: Contract) {
   const dexStorage = await dex.storage<any>();
-  return !new BigNumber(dexStorage.storage.invariant).isZero();
+  return (
+    new BigNumber(dexStorage.storage.tez_pool).isZero() ||
+    new BigNumber(dexStorage.storage.token_pool).isZero()
+  );
 }
 
 export async function findDexNonStrict(
