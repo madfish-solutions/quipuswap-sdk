@@ -8,6 +8,27 @@ yarn add @taquito/taquito @quipuswap/sdk
 
 ## Usage
 
+### Tips
+
+- This module works only with natural numbers. There are no decimals or metadata stuff.
+- `Asset` type. If `id` property exists in token structure, the module assumes that this is an FA2 token.
+
+```typescript
+// Contract = taquito contract
+type ContractOrAddress = Contract | string;
+
+interface Token {
+  contract: ContractOrAddress;
+  id?: BigNumber.Value;
+}
+
+interface FA2Token extends Token {
+  id: BigNumber.Value;
+}
+
+type Asset = Token | "tez";
+```
+
 ### Configure
 
 ```typescript
