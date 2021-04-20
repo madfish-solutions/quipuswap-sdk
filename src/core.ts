@@ -319,19 +319,23 @@ export async function estimateReward(
     const periodFinish = new Date(storage.period_finish);
     const lastUpdateTime = new Date(storage.last_update_time);
     const rewardsTime = now > periodFinish ? periodFinish : now;
-    let newReward = new BigNumber(
-      Math.abs(+rewardsTime - +lastUpdateTime)
-    ).times(storage.reward_per_sec);
+    let newReward = new BigNumber(Math.abs(+rewardsTime - +lastUpdateTime))
+      .idiv(1000)
+      .times(storage.reward_per_sec);
 
     if (now > periodFinish) {
       const periodsDuration = new BigNumber(+now - +periodFinish)
+        .idiv(1000)
         .idiv(VOTING_PERIOD)
         .plus(1)
         .times(VOTING_PERIOD);
       const rewardPerSec = new BigNumber(storage.reward)
         .times(ACCURANCY_MULTIPLIER)
         .idiv(periodsDuration.abs());
-      newReward = new BigNumber(+now - +periodFinish).abs().times(rewardPerSec);
+      newReward = new BigNumber(+now - +periodFinish)
+        .idiv(1000)
+        .abs()
+        .times(rewardPerSec);
     }
 
     const rewardPerShare = new BigNumber(storage.reward_per_share).plus(
