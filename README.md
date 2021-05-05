@@ -274,6 +274,37 @@ const token = {
 })();
 ```
 
+### Get token price
+
+```typescript
+import { findDex, estimateTezInToken } from "@quipuswap/sdk";
+
+const tezos = new TezosToolkit(); // Full sample in "Configure" section
+
+const factories = {
+  fa1_2Factory: "KT1WkKiDSsDttdWrfZgcQ6Z9e3Cp4unHP2CP",
+  fa2Factory: "KT1Bps1VtszT2T3Yvxm5PJ6Rx2nk1FykWPdU",
+};
+const token = {
+  contract: "KT1RX7AdYr9hFZPQTZw5Fu8KkMwVtobHpTp6",
+  id: 0,
+};
+
+(async () => {
+  try {
+    const dex = await findDex(tezos, factories, token);
+    const dexStorage = await dex.storage();
+
+    const tokenValue = 4_000;
+    const inTezValue = estimateTezInToken(dexStorage, tokenValue);
+
+    console.info(`4_000 tokens in tez: ${inTezValue}`);
+  } catch (err) {
+    console.error(err);
+  }
+})();
+```
+
 # TSDX User Guide
 
 Congrats! You just saved yourself hours of work by bootstrapping this project with TSDX. Let’s get you oriented with what’s here and how to use it.
