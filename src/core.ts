@@ -96,7 +96,7 @@ export async function swap(
           inputDex,
           value,
           intermediateValueToMin,
-          toAccount
+          fromAccount
         ),
         Dex.tezToTokenPayment(
           outputDex,
