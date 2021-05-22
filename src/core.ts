@@ -435,7 +435,7 @@ export async function isDexExistAndContainsLiquidity(
 
 export async function isDexContainsLiquidity(dex: Contract) {
   const dexStorage = await dex.storage<any>();
-  return (
+  return !(
     new BigNumber(dexStorage.storage.tez_pool).isZero() ||
     new BigNumber(dexStorage.storage.token_pool).isZero()
   );
@@ -564,6 +564,6 @@ export class DexAlreadyContainsLiquidity implements Error {
 }
 
 export class DexNotContainsLiquidity implements Error {
-  name = "DexAlreadyContainsLiquidity";
+  name = "DexNotContainsLiquidity";
   message = "Dex doesn't contains liquidity. Use 'initializeLiquidity'";
 }
