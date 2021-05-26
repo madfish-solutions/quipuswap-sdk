@@ -8,6 +8,7 @@ import {
   FA2Token,
   Asset,
   ContractOrAddress,
+  Contract,
 } from "./types";
 
 export function fromOpOpts(
@@ -42,11 +43,13 @@ export function estimateTransfers(
 
 export async function toContract(
   tezos: TezosToolkit,
-  contractOrAddress: ContractOrAddress
-) {
-  return typeof contractOrAddress === "string"
-    ? tezos.contract.at(contractOrAddress)
-    : contractOrAddress;
+  entry: FoundDex | ContractOrAddress
+): Promise<Contract> {
+  return typeof entry === "string"
+    ? tezos.contract.at(entry)
+    : entry instanceof FoundDex
+    ? entry.contract
+    : entry;
 }
 
 export function toContractAddress(contractOrAddress: ContractOrAddress) {
@@ -93,4 +96,8 @@ export class ReadOnlySigner implements Signer {
   }> {
     throw new Error("Cannot sign");
   }
+}
+
+export class FoundDex {
+  constructor(public contract: Contract, public storage: any) {}
 }
