@@ -19,6 +19,7 @@ import {
 } from "./helpers";
 import { Factory, Dex, FA1_2, FA2 } from "./contracts";
 import {
+  isDexContainsLiquidity,
   estimateTokenInTez,
   estimateTezInToken,
   estimateTezInShares,
@@ -27,6 +28,7 @@ import {
   estimateTokenToTez,
   estimateTezToTokenInverse,
   estimateTokenToTezInverse,
+  withSlippage,
 } from "./estimates";
 import { ACCURANCY_MULTIPLIER, VOTING_PERIOD } from "./defaults";
 
@@ -161,7 +163,7 @@ export async function initializeLiquidity(
   tezValue: BigNumber.Value
 ) {
   const dex = await findDexNonStrict(tezos, factories, token);
-  if (dex && (await isDexContainsLiquidity(dex))) {
+  if (dex && isDexContainsLiquidity(dex.storage)) {
     throw new DexAlreadyContainsLiquidity();
   }
 
@@ -202,7 +204,7 @@ export async function addLiquidity(
     | { tezValue: BigNumber.Value }
 ) {
   dex = await toFoundDex(tezos, dex);
-  if (!(await isDexContainsLiquidity(dex))) {
+  if (!isDexContainsLiquidity(dex.storage)) {
     throw new DexNotContainsLiquidity();
   }
 
@@ -429,14 +431,7 @@ export async function isDexExistAndContainsLiquidity(
 ) {
   const dex = await findDexNonStrict(tezos, factories, token);
   if (!dex) return false;
-  return isDexContainsLiquidity(dex);
-}
-
-export async function isDexContainsLiquidity(dex: FoundDex) {
-  return !(
-    new BigNumber(dex.storage.storage.tez_pool).isZero() ||
-    new BigNumber(dex.storage.storage.token_pool).isZero()
-  );
+  return isDexContainsLiquidity(dex.storage);
 }
 
 export async function findDexNonStrict(
@@ -452,19 +447,6 @@ export async function findDexNonStrict(
     }
     throw err;
   }
-}
-
-export async function toFoundDex(
-  tezos: TezosToolkit,
-  dex: FoundDex | ContractOrAddress
-): Promise<FoundDex> {
-  if (dex instanceof FoundDex) {
-    return dex;
-  }
-
-  const contract = await toContract(tezos, dex);
-  const storage = await contract.storage();
-  return new FoundDex(contract, storage);
 }
 
 export async function findDex(
@@ -506,6 +488,19 @@ export async function findDex(
   }
 }
 
+export async function toFoundDex(
+  tezos: TezosToolkit,
+  dex: FoundDex | ContractOrAddress
+): Promise<FoundDex> {
+  if (dex instanceof FoundDex) {
+    return dex;
+  }
+
+  const contract = await toContract(tezos, dex);
+  const storage = await contract.storage();
+  return new FoundDex(contract, storage);
+}
+
 export async function withTokenApprove(
   tezos: TezosToolkit,
   token: Token,
@@ -544,7 +539,7 @@ export async function withTokenApprove(
   try {
     await estimateTransfers(tezos, [approveParams]);
   } catch (err) {
-    if (isUnsafeAllowanceChangeError(err)) {
+    if (FA1_2.isUnsafeAllowanceChangeError(err)) {
       resetApprove = true;
     }
   }
@@ -552,28 +547,6 @@ export async function withTokenApprove(
   return resetApprove
     ? [FA1_2.approve(tokenContract, to, 0), approveParams, ...transfers]
     : [approveParams, ...transfers];
-}
-
-export function isUnsafeAllowanceChangeError(err: any): boolean {
-  try {
-    return (
-      err?.message === FA1_2.Errors.UnsafeAllowanceChange ||
-      err?.errors?.some(
-        (e: any) =>
-          e?.with?.int === "23" ||
-          e?.with?.string === FA1_2.Errors.UnsafeAllowanceChange ||
-          e?.with?.args?.[0]?.string === FA1_2.Errors.UnsafeAllowanceChange
-      )
-    );
-  } catch {
-    return false;
-  }
-}
-
-export function withSlippage(val: BigNumber.Value, tolerance: BigNumber.Value) {
-  return new BigNumber(val)
-    .times(new BigNumber(1).minus(tolerance))
-    .integerValue(BigNumber.ROUND_DOWN);
 }
 
 export function chooseDex(a: FoundDex, b: FoundDex) {
