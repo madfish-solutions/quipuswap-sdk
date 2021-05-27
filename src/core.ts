@@ -549,8 +549,10 @@ export async function withTokenApprove(
     : [approveParams, ...transfers];
 }
 
-export function chooseDex(a: FoundDex, b: FoundDex) {
-  return b.storage.storage.tez_pool - a.storage.storage.tez_pool;
+export function chooseDex(a: FoundDex, b: FoundDex): number {
+  return new BigNumber(b.storage.storage.tez_pool)
+    .minus(a.storage.storage.tez_pool)
+    .toNumber();
 }
 
 /**
