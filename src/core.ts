@@ -223,6 +223,30 @@ export async function addLiquidity(
     tokenValue = estimateTokenInTez(dex.storage, tezValue);
   }
 
+  const { storage: s } = dex.storage;
+
+  const sharesPurchased = new BigNumber(tezValue)
+    .times(s.total_supply)
+    .idiv(s.tez_pool);
+  if (sharesPurchased.isLessThanOrEqualTo(0)) {
+    throw new IneligibleAmountError();
+  }
+
+  let tokensRequired = sharesPurchased.times(s.token_pool).idiv(s.total_supply);
+  if (
+    sharesPurchased
+      .times(s.token_pool)
+      .isGreaterThan(tokensRequired.times(s.total_supply))
+  ) {
+    tokensRequired = tokensRequired.plus(1);
+  }
+  if (
+    tokensRequired.isLessThanOrEqualTo(0) ||
+    tokensRequired.isGreaterThan(tokenValue)
+  ) {
+    throw new IneligibleAmountError();
+  }
+
   const fromAccount = await tezos.signer.publicKeyHash();
 
   return withTokenApprove(
@@ -557,17 +581,22 @@ export function chooseDex(a: FoundDex, b: FoundDex) {
  * Errors
  */
 
-export class DexNotFoundError implements Error {
+export class IneligibleAmountError extends Error {
+  name = "IneligibleAmountError";
+  message = "Ineligible amount";
+}
+
+export class DexNotFoundError extends Error {
   name = "DexNotFoundError";
   message = "Dex contract for token not found";
 }
 
-export class DexAlreadyContainsLiquidity implements Error {
+export class DexAlreadyContainsLiquidity extends Error {
   name = "DexAlreadyContainsLiquidity";
   message = "Dex already contains liquidity. Use 'addLiquidity'";
 }
 
-export class DexNotContainsLiquidity implements Error {
+export class DexNotContainsLiquidity extends Error {
   name = "DexNotContainsLiquidity";
   message = "Dex doesn't contains liquidity. Use 'initializeLiquidity'";
 }
