@@ -34,6 +34,11 @@ export interface FA2Token extends Token {
 export type Asset = Token | "tez";
 
 export interface Factories {
+  fa1_2Factory: ContractOrAddress | ContractOrAddress[];
+  fa2Factory: ContractOrAddress | ContractOrAddress[];
+}
+
+export interface StrictFactories extends Factories {
   fa1_2Factory: ContractOrAddress;
   fa2Factory: ContractOrAddress;
 }

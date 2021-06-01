@@ -139,3 +139,16 @@ export function estimateTezInToken(
     .times(dexStorage.storage.tez_pool)
     .idiv(dexStorage.storage.token_pool);
 }
+
+export function isDexContainsLiquidity(dexStorage: any) {
+  return !(
+    new BigNumber(dexStorage.storage.tez_pool).isZero() ||
+    new BigNumber(dexStorage.storage.token_pool).isZero()
+  );
+}
+
+export function withSlippage(val: BigNumber.Value, tolerance: BigNumber.Value) {
+  return new BigNumber(val)
+    .times(new BigNumber(1).minus(tolerance))
+    .integerValue(BigNumber.ROUND_DOWN);
+}
