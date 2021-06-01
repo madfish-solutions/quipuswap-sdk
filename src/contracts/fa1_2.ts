@@ -48,8 +48,5 @@ export function isUnsafeAllowanceChangeError(err: any): boolean {
 }
 
 function isUACErrorMessage(errMessage: any) {
-  return [
-    Errors.UnsafeAllowanceChange,
-    `FA1.2_${Errors.UnsafeAllowanceChange}`,
-  ].includes(errMessage);
+  return Boolean(errMessage?.includes(Errors.UnsafeAllowanceChange));
 }
