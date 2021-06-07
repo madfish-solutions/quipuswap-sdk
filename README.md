@@ -293,10 +293,9 @@ const token = {
 (async () => {
   try {
     const dex = await findDex(tezos, factories, token);
-    const dexStorage = await dex.storage();
 
     const tokenValue = 4_000;
-    const inTezValue = estimateTezInToken(dexStorage, tokenValue);
+    const inTezValue = estimateTezInToken(dex.storage, tokenValue);
 
     console.info(`4_000 tokens in tez: ${inTezValue}`);
   } catch (err) {
