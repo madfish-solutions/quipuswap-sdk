@@ -66,7 +66,7 @@ export function divestLiquidity(
   opts?: OperationOptions
 ) {
   return dex.methods
-    .investLiquidity(tezValueMin, tokenValueMin, shares)
+    .divestLiquidity(tezValueMin, tokenValueMin, shares)
     .toTransferParams(fromOpOpts(undefined, opts));
 }
 
