@@ -2,6 +2,7 @@ import BigNumber from "bignumber.js";
 import {
   ContractAbstraction,
   ContractProvider,
+  TezosToolkit,
   Wallet,
   WalletOperationBatch,
 } from "@taquito/taquito";
@@ -56,3 +57,8 @@ export interface FA2UpdateOperatorsParams {
   from: string;
   to: string;
 }
+
+export type ContractResolver = (
+  tezos: TezosToolkit,
+  address: string
+) => Promise<Contract>;

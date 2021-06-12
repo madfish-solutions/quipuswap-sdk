@@ -9,7 +9,15 @@ import {
   Asset,
   ContractOrAddress,
   Contract,
+  ContractResolver,
 } from "./types";
+
+let contractResolver: ContractResolver = (tezos, address) =>
+  tezos.contract.at(address);
+
+export function setContractResolver(resolver: ContractResolver) {
+  contractResolver = resolver;
+}
 
 export function fromOpOpts(
   tezValue: BigNumber.Value = 0,
@@ -46,7 +54,7 @@ export async function toContract(
   entry: FoundDex | ContractOrAddress
 ): Promise<Contract> {
   return typeof entry === "string"
-    ? tezos.contract.at(entry)
+    ? contractResolver(tezos, entry)
     : entry instanceof FoundDex
     ? entry.contract
     : entry;

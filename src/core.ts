@@ -472,7 +472,7 @@ export async function findDex(
       const dexAddress = await facStorage.token_to_exchange.get(t2dexQuery);
 
       if (dexAddress) {
-        const dexContract = await tezos.contract.at(dexAddress);
+        const dexContract = await toContract(tezos, dexAddress);
         const dexStorage = await dexContract.storage<any>();
         dexes.push(new FoundDex(dexContract, dexStorage));
       }
