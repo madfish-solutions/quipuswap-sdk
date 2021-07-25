@@ -73,7 +73,7 @@ const factories = {
     const swapParams = await swap(
       tezos,
       factories,
-      fromAsset
+      fromAsset,
       toAsset,
       inputValue,
       slippageTolerance
@@ -117,7 +117,7 @@ const factories = {
     const estimatedOutputValue = await estimateSwap(
       tezos,
       factories,
-      fromAsset
+      fromAsset,
       toAsset,
       { inputValue }
     );
@@ -127,7 +127,7 @@ const factories = {
     const estimatedInputValue = await estimateSwap(
       tezos,
       factories,
-      fromAsset
+      fromAsset,
       toAsset,
       { outputValue: estimatedOutputValue }
     );
