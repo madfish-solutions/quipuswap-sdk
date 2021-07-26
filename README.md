@@ -45,7 +45,8 @@ tezos.setSignerProvider(new ReadOnlySigner(publicKeyHash, publicKey));
 // Or if you using `privateKey`
 import { InMemorySigner } from "@taquito/signer";
 
-tezos.setSignerProvider(new InMemorySigner.fromSecretKey(privateKey));
+InMemorySigner.fromSecretKey(privateKey).then(signer=>tezos.setSignerProvider(signer));
+
 ```
 
 ### Swap
