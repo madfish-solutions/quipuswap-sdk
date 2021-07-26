@@ -35,7 +35,7 @@
     "@taquito/taquito": "^8 || ^9"
   },
   "devDependencies": {
-    "@taquito/taquito": "^8.1.0",
+    "@taquito/taquito": "^9.2.0",
     "husky": "^4.3.8",
     "tsdx": "^0.14.1",
     "tslib": "^2.1.0",
