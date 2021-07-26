@@ -45,7 +45,8 @@ tezos.setSignerProvider(new ReadOnlySigner(publicKeyHash, publicKey));
 // Or if you using `privateKey`
 import { InMemorySigner } from "@taquito/signer";
 
-tezos.setSignerProvider(new InMemorySigner.fromSecretKey(privateKey));
+InMemorySigner.fromSecretKey(privateKey).then(signer=>tezos.setSignerProvider(signer));
+
 ```
 
 ### Swap
@@ -73,7 +74,7 @@ const factories = {
     const swapParams = await swap(
       tezos,
       factories,
-      fromAsset
+      fromAsset,
       toAsset,
       inputValue,
       slippageTolerance
@@ -117,7 +118,7 @@ const factories = {
     const estimatedOutputValue = await estimateSwap(
       tezos,
       factories,
-      fromAsset
+      fromAsset,
       toAsset,
       { inputValue }
     );
@@ -127,7 +128,7 @@ const factories = {
     const estimatedInputValue = await estimateSwap(
       tezos,
       factories,
-      fromAsset
+      fromAsset,
       toAsset,
       { outputValue: estimatedOutputValue }
     );
