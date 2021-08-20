@@ -45,8 +45,9 @@ tezos.setSignerProvider(new ReadOnlySigner(publicKeyHash, publicKey));
 // Or if you using `privateKey`
 import { InMemorySigner } from "@taquito/signer";
 
-InMemorySigner.fromSecretKey(privateKey).then(signer=>tezos.setSignerProvider(signer));
-
+InMemorySigner.fromSecretKey(privateKey).then((signer) =>
+  tezos.setSignerProvider(signer)
+);
 ```
 
 ### Swap
@@ -66,7 +67,7 @@ const factories = {
     const fromAsset = "tez";
     const toAsset = {
       contract: "KT1RX7AdYr9hFZPQTZw5Fu8KkMwVtobHpTp6",
-      id: 0
+      id: 0,
     };
     const inputValue = 10_000_000; // in mutez (without decimals)
     const slippageTolerance = 0.005; // 0.5%
@@ -80,10 +81,7 @@ const factories = {
       slippageTolerance
     );
 
-    const op = await batchify(
-      tezos.wallet.batch([]),
-      swapParams
-    ).send();
+    const op = await batchify(tezos.wallet.batch([]), swapParams).send();
 
     console.info(op.hash);
     await op.confirmation();
@@ -111,7 +109,7 @@ const factories = {
     const fromAsset = "tez";
     const toAsset = {
       contract: "KT1RX7AdYr9hFZPQTZw5Fu8KkMwVtobHpTp6",
-      id: 0
+      id: 0,
     };
     const inputValue = 10_000_000; // in mutez (without decimals)
 
@@ -134,6 +132,44 @@ const factories = {
     );
 
     console.info({ estimatedInputValue });
+  } catch (err) {
+    console.error(err);
+  }
+})();
+```
+
+- If you already have dexes, you can use it for `estimateSwap()`:
+
+```typescript
+import { estimateSwap } from "@quipuswap/sdk";
+
+const tezos = new TezosToolkit(); // Full sample in "Configure" section
+
+const factories = {
+  fa1_2Factory: "KT1WkKiDSsDttdWrfZgcQ6Z9e3Cp4unHP2CP",
+  fa2Factory: "KT1Bps1VtszT2T3Yvxm5PJ6Rx2nk1FykWPdU",
+};
+
+(async () => {
+  try {
+    const fromAsset = "tez";
+    const toAsset = {
+      contract: "KT1RX7AdYr9hFZPQTZw5Fu8KkMwVtobHpTp6",
+      id: 0,
+    };
+    const inputValue = 10_000_000; // in mutez (without decimals)
+
+    const inputDex = await findDex(tezos, factories, toAsset);
+    const estimatedOutputValue = await estimateSwap(
+      tezos,
+      factories,
+      fromAsset,
+      toAsset,
+      { inputValue },
+      { inputDex }
+    );
+
+    console.info({ estimatedOutputValue });
   } catch (err) {
     console.error(err);
   }
