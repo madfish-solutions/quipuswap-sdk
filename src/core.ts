@@ -117,24 +117,26 @@ export async function estimateSwap(
   factories: Factories,
   fromAsset: Asset,
   toAsset: Asset,
-  values: { inputValue: BigNumber.Value } | { outputValue: BigNumber.Value }
+  values: { inputValue: BigNumber.Value } | { outputValue: BigNumber.Value },
+  dexes?: { inputDex?: FoundDex; outputDex?: FoundDex }
 ) {
   if (isTezAsset(fromAsset) && isTokenAsset(toAsset)) {
-    const dex = await findDex(tezos, factories, toAsset);
+    const dex = dexes?.inputDex ?? (await findDex(tezos, factories, toAsset));
 
     return "outputValue" in values
       ? estimateTezToTokenInverse(dex.storage, values.outputValue)
       : estimateTezToToken(dex.storage, values.inputValue);
   } else if (isTokenAsset(fromAsset) && isTezAsset(toAsset)) {
-    const dex = await findDex(tezos, factories, fromAsset);
+    const dex =
+      dexes?.outputDex ?? (await findDex(tezos, factories, fromAsset));
 
     return "outputValue" in values
       ? estimateTokenToTezInverse(dex.storage, values.outputValue)
       : estimateTokenToTez(dex.storage, values.inputValue);
   } else if (isTokenAsset(fromAsset) && isTokenAsset(toAsset)) {
     const [inputDex, outputDex] = await Promise.all([
-      findDex(tezos, factories, fromAsset),
-      findDex(tezos, factories, toAsset),
+      dexes?.inputDex ?? findDex(tezos, factories, fromAsset),
+      dexes?.outputDex ?? findDex(tezos, factories, toAsset),
     ]);
 
     if ("outputValue" in values) {
