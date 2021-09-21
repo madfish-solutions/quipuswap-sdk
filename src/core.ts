@@ -222,7 +222,7 @@ export async function addLiquidity(
     tezValue = estimateTezInToken(dex.storage, tokenValue);
   } else {
     tezValue = values.tezValue;
-    tokenValue = estimateTokenInTez(dex.storage, tezValue);
+    tokenValue = estimateTokenInTez(dex.storage, tezValue).plus(1);
   }
 
   const fromAccount = await tezos.signer.publicKeyHash();
