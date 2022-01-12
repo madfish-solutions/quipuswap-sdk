@@ -1,6 +1,6 @@
 {
   "name": "@quipuswap/sdk",
-  "version": "2.3.0",
+  "version": "3.0.0",
   "main": "dist/index.js",
   "module": "dist/sdk.esm.js",
   "typings": "dist/index.d.ts",
