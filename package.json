@@ -29,16 +29,16 @@
     "prepare": "tsdx build"
   },
   "dependencies": {
-    "bignumber.js": "^9.0.1"
+    "bignumber.js": "^9.0.2"
   },
   "peerDependencies": {
-    "@taquito/taquito": "^8 || ^9"
+    "@taquito/taquito": "^11.1.0"
   },
   "devDependencies": {
-    "@taquito/taquito": "^9.2.0",
+    "@taquito/taquito": "^11.1.0",
     "husky": "^4.3.8",
     "tsdx": "^0.14.1",
-    "tslib": "^2.1.0",
+    "tslib": "^2.3.1",
     "typescript": "^3.7.3"
   },
   "resolutions": {
