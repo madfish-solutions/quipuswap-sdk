@@ -38,8 +38,7 @@ import { ReadOnlySigner } from "@quipuswap/sdk";
 const publicKeyHash = "tz1fVQangAfb9J1hRRMP2bSB6LvASD6KpY8A";
 const publicKey = "edpkvWbk81uh1DEvdWKR4g1bjyTGhdu1mDvznPUFE2zDwNsLXrEb9K";
 
-const tezos = new TezosToolkit("https://florencenet.smartpy.io");
-tezos.setPackerProvider(new MichelCodecPacker());
+const tezos = new TezosToolkit("https://hangzhounet.smartpy.io");
 tezos.setSignerProvider(new ReadOnlySigner(publicKeyHash, publicKey));
 
 // Or if you using `privateKey`
@@ -58,18 +57,18 @@ import { swap, batchify } from "@quipuswap/sdk";
 const tezos = new TezosToolkit(); // Full sample in "Configure" section
 
 const factories = {
-  fa1_2Factory: "KT1WkKiDSsDttdWrfZgcQ6Z9e3Cp4unHP2CP",
-  fa2Factory: "KT1Bps1VtszT2T3Yvxm5PJ6Rx2nk1FykWPdU",
+  fa1_2Factory: "KT1HrQWkSFe7ugihjoMWwQ7p8ja9e18LdUFn",
+  fa2Factory: "KT1Dx3SZ6r4h2BZNQM8xri1CtsdNcAoXLGZB",
 };
 
 (async () => {
   try {
     const fromAsset = "tez";
     const toAsset = {
-      contract: "KT1RX7AdYr9hFZPQTZw5Fu8KkMwVtobHpTp6",
+      contract: "KT1EKo1Eihucz9N4cQyaDKeYRoMzTEoiZRAT",
       id: 0,
     };
-    const inputValue = 10_000_000; // in mutez (without decimals)
+    const inputValue = 1_000_000; // in mutez (without decimals)
     const slippageTolerance = 0.005; // 0.5%
 
     const swapParams = await swap(
@@ -100,15 +99,15 @@ import { estimateSwap } from "@quipuswap/sdk";
 const tezos = new TezosToolkit(); // Full sample in "Configure" section
 
 const factories = {
-  fa1_2Factory: "KT1WkKiDSsDttdWrfZgcQ6Z9e3Cp4unHP2CP",
-  fa2Factory: "KT1Bps1VtszT2T3Yvxm5PJ6Rx2nk1FykWPdU",
+  fa1_2Factory: "KT1HrQWkSFe7ugihjoMWwQ7p8ja9e18LdUFn",
+  fa2Factory: "KT1Dx3SZ6r4h2BZNQM8xri1CtsdNcAoXLGZB",
 };
 
 (async () => {
   try {
     const fromAsset = "tez";
     const toAsset = {
-      contract: "KT1RX7AdYr9hFZPQTZw5Fu8KkMwVtobHpTp6",
+      contract: "KT1EKo1Eihucz9N4cQyaDKeYRoMzTEoiZRAT",
       id: 0,
     };
     const inputValue = 10_000_000; // in mutez (without decimals)
@@ -146,15 +145,15 @@ import { estimateSwap } from "@quipuswap/sdk";
 const tezos = new TezosToolkit(); // Full sample in "Configure" section
 
 const factories = {
-  fa1_2Factory: "KT1WkKiDSsDttdWrfZgcQ6Z9e3Cp4unHP2CP",
-  fa2Factory: "KT1Bps1VtszT2T3Yvxm5PJ6Rx2nk1FykWPdU",
+  fa1_2Factory: "KT1HrQWkSFe7ugihjoMWwQ7p8ja9e18LdUFn",
+  fa2Factory: "KT1Dx3SZ6r4h2BZNQM8xri1CtsdNcAoXLGZB",
 };
 
 (async () => {
   try {
     const fromAsset = "tez";
     const toAsset = {
-      contract: "KT1RX7AdYr9hFZPQTZw5Fu8KkMwVtobHpTp6",
+      contract: "KT1EKo1Eihucz9N4cQyaDKeYRoMzTEoiZRAT",
       id: 0,
     };
     const inputValue = 10_000_000; // in mutez (without decimals)
@@ -184,11 +183,11 @@ import { findDex, addLiquidity } from "@quipuswap/sdk";
 const tezos = new TezosToolkit(); // Full sample in "Configure" section
 
 const factories = {
-  fa1_2Factory: "KT1WkKiDSsDttdWrfZgcQ6Z9e3Cp4unHP2CP",
-  fa2Factory: "KT1Bps1VtszT2T3Yvxm5PJ6Rx2nk1FykWPdU",
+  fa1_2Factory: "KT1HrQWkSFe7ugihjoMWwQ7p8ja9e18LdUFn",
+  fa2Factory: "KT1Dx3SZ6r4h2BZNQM8xri1CtsdNcAoXLGZB",
 };
 const token = {
-  contract: "KT1RX7AdYr9hFZPQTZw5Fu8KkMwVtobHpTp6",
+  contract: "KT1EKo1Eihucz9N4cQyaDKeYRoMzTEoiZRAT",
   id: 0,
 };
 
@@ -230,11 +229,11 @@ import { findDex, removeLiquidity } from "@quipuswap/sdk";
 const tezos = new TezosToolkit(); // Full sample in "Configure" section
 
 const factories = {
-  fa1_2Factory: "KT1WkKiDSsDttdWrfZgcQ6Z9e3Cp4unHP2CP",
-  fa2Factory: "KT1Bps1VtszT2T3Yvxm5PJ6Rx2nk1FykWPdU",
+  fa1_2Factory: "KT1HrQWkSFe7ugihjoMWwQ7p8ja9e18LdUFn",
+  fa2Factory: "KT1Dx3SZ6r4h2BZNQM8xri1CtsdNcAoXLGZB",
 };
 const token = {
-  contract: "KT1RX7AdYr9hFZPQTZw5Fu8KkMwVtobHpTp6",
+  contract: "KT1EKo1Eihucz9N4cQyaDKeYRoMzTEoiZRAT",
   id: 0,
 };
 
@@ -276,11 +275,11 @@ import { findDex, initializeLiquidity } from "@quipuswap/sdk";
 const tezos = new TezosToolkit(); // Full sample in "Configure" section
 
 const factories = {
-  fa1_2Factory: "KT1WkKiDSsDttdWrfZgcQ6Z9e3Cp4unHP2CP",
-  fa2Factory: "KT1Bps1VtszT2T3Yvxm5PJ6Rx2nk1FykWPdU",
+  fa1_2Factory: "KT1HrQWkSFe7ugihjoMWwQ7p8ja9e18LdUFn",
+  fa2Factory: "KT1Dx3SZ6r4h2BZNQM8xri1CtsdNcAoXLGZB",
 };
 const token = {
-  contract: "KT1RX7AdYr9hFZPQTZw5Fu8KkMwVtobHpTp6",
+  contract: "KT1EKo1Eihucz9N4cQyaDKeYRoMzTEoiZRAT",
   id: 0,
 };
 
@@ -319,11 +318,11 @@ import { findDex, estimateTezInToken } from "@quipuswap/sdk";
 const tezos = new TezosToolkit(); // Full sample in "Configure" section
 
 const factories = {
-  fa1_2Factory: "KT1WkKiDSsDttdWrfZgcQ6Z9e3Cp4unHP2CP",
-  fa2Factory: "KT1Bps1VtszT2T3Yvxm5PJ6Rx2nk1FykWPdU",
+  fa1_2Factory: "KT1HrQWkSFe7ugihjoMWwQ7p8ja9e18LdUFn",
+  fa2Factory: "KT1Dx3SZ6r4h2BZNQM8xri1CtsdNcAoXLGZB",
 };
 const token = {
-  contract: "KT1RX7AdYr9hFZPQTZw5Fu8KkMwVtobHpTp6",
+  contract: "KT1EKo1Eihucz9N4cQyaDKeYRoMzTEoiZRAT",
   id: 0,
 };
 
