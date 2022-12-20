@@ -29,7 +29,7 @@
     "prepare": "tsdx build"
   },
   "dependencies": {
-    "bignumber.js": "^9.0.2"
+    "bignumber.js": "^9.1.0"
   },
   "peerDependencies": {
     "@taquito/taquito": "^11.1.0"
