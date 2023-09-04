@@ -32,7 +32,7 @@
     "bignumber.js": "^9.1.0"
   },
   "peerDependencies": {
-    "@taquito/taquito": "^11.1.0"
+    "@taquito/taquito": "^15.0.0"
   },
   "devDependencies": {
     "@taquito/taquito": "^15.0.0",
