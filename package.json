@@ -1,6 +1,6 @@
 {
   "name": "@quipuswap/sdk",
-  "version": "3.0.2",
+  "version": "3.1.0",
   "main": "dist/index.js",
   "module": "dist/sdk.esm.js",
   "typings": "dist/index.d.ts",
@@ -32,7 +32,7 @@
     "bignumber.js": "^9.1.0"
   },
   "peerDependencies": {
-    "@taquito/taquito": "^11.1.0"
+    "@taquito/taquito": "^13.0.0"
   },
   "devDependencies": {
     "@taquito/taquito": "^15.0.0",
